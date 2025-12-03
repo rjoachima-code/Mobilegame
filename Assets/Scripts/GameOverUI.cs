@@ -163,14 +163,7 @@ namespace JACAMENO
         {
             string shareText = $"I scored {finalScore:N0} points in JACAMENO! Can you beat my score?";
             
-#if UNITY_ANDROID || UNITY_IOS
-            // Mobile sharing
-            new NativeShare()
-                .SetSubject("JACAMENO High Score!")
-                .SetText(shareText)
-                .Share();
-#else
-            // Desktop: copy to clipboard
+            // Copy to clipboard - works on all platforms
             GUIUtility.systemCopyBuffer = shareText;
             Debug.Log("Score copied to clipboard!");
 #endif

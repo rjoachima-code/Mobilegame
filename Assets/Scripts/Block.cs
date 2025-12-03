@@ -106,7 +106,7 @@ namespace JACAMENO
         /// </summary>
         public bool CanMergeWith(Block other)
         {
-            return other != null && other.Value == this.Value && !other.IsLocked == !this.IsLocked;
+            return other != null && other.Value == this.Value && other.IsLocked == this.IsLocked;
         }
 
         /// <summary>

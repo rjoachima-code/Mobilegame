@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/app/src/main/cpp/SaveManager.cpp">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/cpp/SaveManager.cpp" />
+              <option name="updatedContent" value="#include &quot;SaveManager.h&quot;&#10;#include &lt;fstream&gt;&#10;&#10;bool SaveManager::save(const SaveState &amp;state, const char *path) {&#10;    std::ofstream ofs(path, std::ios::binary);&#10;    if (!ofs) return false;&#10;    ofs.write(reinterpret_cast&lt;const char*&gt;(&amp;state), sizeof(state));&#10;    return ofs.good();&#10;}&#10;&#10;bool SaveManager::load(SaveState &amp;outState, const char *path) {&#10;    std::ifstream ifs(path, std::ios::binary);&#10;    if (!ifs) return false;&#10;    ifs.read(reinterpret_cast&lt;char*&gt;(&amp;outState), sizeof(outState));&#10;    return ifs.good();&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

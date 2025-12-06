@@ -1,4 +1,6 @@
 #include <jni.h>
+#include <thread>
+#include <atomic>
 
 #include <game-activity/native_app_glue/android_native_app_glue.h>
 #include <game-activity/GameActivity.h>
@@ -11,7 +13,9 @@
 
 extern "C" {
 
-static struct android_app* g_pApp = nullptr;
+// make g_pApp externally visible so other native units (JNI) can set window etc.
+struct android_app* g_pApp = nullptr;
+static std::atomic<bool> g_native_thread_started(false);
 
 /*!
  * Handles commands sent to this Android application
@@ -22,6 +26,7 @@ void handle_cmd(android_app *pApp, int32_t cmd) {
     switch (cmd) {
         case APP_CMD_INIT_WINDOW:
             // A new window is created, create Renderer and GameLoop and store GameLoop in userData
+            aout << "handle_cmd: APP_CMD_INIT_WINDOW received" << std::endl;
             if (pApp->window) {
                 // initialize asset manager for native code
                 Assets::init(pApp->activity->assetManager);
@@ -35,6 +40,8 @@ void handle_cmd(android_app *pApp, int32_t cmd) {
                     // Note: keep thread attached; AudioManager stores JavaVM
                 }
 
+                aout << "handle_cmd: creating Renderer and GameLoop" << std::endl;
+
                 auto renderer = new Renderer(pApp);
                 // Renderer constructor initializes GL internally
                 auto loop = new GameLoop(pApp, renderer);
@@ -42,6 +49,7 @@ void handle_cmd(android_app *pApp, int32_t cmd) {
             }
             break;
         case APP_CMD_TERM_WINDOW:
+            aout << "handle_cmd: APP_CMD_TERM_WINDOW received" << std::endl;
             // The window is being destroyed. Clean up userData
             if (pApp->userData) {
                 auto *pLoop = reinterpret_cast<GameLoop *>(pApp->userData);
@@ -134,8 +142,29 @@ void android_main(struct android_app *pApp) {
  */
 extern "C" JNIEXPORT void JNICALL
 Java_com_google_androidgamesdk_GameActivity_initializeNativeCode(JNIEnv* env, jclass clazz, jobject activity) {
-    // Minimal initialization: log and no-op. GameActivity will later create the native app via android_main.
     aout << "Java_com_google_androidgamesdk_GameActivity_initializeNativeCode: native library loaded" << std::endl;
+
+    // Spawn a background thread to run android_main once g_pApp is available.
+    if (!g_native_thread_started.exchange(true)) {
+        std::thread nativeThread([]() {
+            aout << "nativeThread: waiting for g_pApp to be set..." << std::endl;
+            // wait up to a short timeout for the Java side to set a window/g_pApp via JNI
+            int tries = 0;
+            while (!g_pApp && tries < 50) { // ~5 seconds
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                ++tries;
+            }
+            if (!g_pApp) {
+                aout << "nativeThread: g_pApp not set after wait, creating minimal android_app? aborting start" << std::endl;
+                return;
+            }
+            aout << "nativeThread: calling android_main with g_pApp=" << (void*)g_pApp << std::endl;
+            // Call android_main on this new thread
+            android_main(g_pApp);
+            aout << "nativeThread: android_main returned" << std::endl;
+        });
+        nativeThread.detach();
+    }
 }
 
 extern "C" JNIEXPORT jint JNICALL

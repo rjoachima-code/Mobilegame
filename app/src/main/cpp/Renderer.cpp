@@ -132,6 +132,11 @@ Renderer::~Renderer() {
         eglTerminate(display_);
         display_ = EGL_NO_DISPLAY;
     }
+    // If we own a raw ANativeWindow reference, release it here
+    if (ownsWindow_ && window_) {
+        ANativeWindow_release(window_);
+        window_ = nullptr;
+    }
 }
 
 void Renderer::render() {
@@ -294,7 +299,21 @@ void Renderer::initRenderer() {
     // create the proper window surface
     EGLint format;
     eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format);
-    EGLSurface surface = eglCreateWindowSurface(display, config, app_->window, nullptr);
+    // Use provided window_ if present (created from JNI), otherwise use app_->window
+    ANativeWindow* nativeWin = nullptr;
+    if (window_) nativeWin = window_;
+    else if (app_ && app_->window) nativeWin = app_->window;
+    else nativeWin = nullptr;
+
+    if (!nativeWin) {
+        aout << "initRenderer: no ANativeWindow available, aborting initRenderer" << std::endl;
+        display_ = EGL_NO_DISPLAY;
+        surface_ = EGL_NO_SURFACE;
+        context_ = EGL_NO_CONTEXT;
+        return;
+    }
+
+    EGLSurface surface = eglCreateWindowSurface(display, config, nativeWin, nullptr);
 
     // Create a GLES 3 context
     EGLint contextAttribs[] = {EGL_CONTEXT_CLIENT_VERSION, 3, EGL_NONE};
@@ -317,13 +336,17 @@ void Renderer::initRenderer() {
     PRINT_GL_STRING(GL_VERSION);
     PRINT_GL_STRING_AS_LIST(GL_EXTENSIONS);
 
+    aout << "initRenderer: after printing GL strings" << std::endl;
+
     shader_ = std::unique_ptr<Shader>(
             Shader::loadShader(vertex, fragment, "inPosition", "inUV", "uProjection"));
+    if (!shader_) aout << "initRenderer: shader_ failed to load" << std::endl;
     assert(shader_);
 
     // Note: there's only one shader in this demo, so I'll activate it here. For a more complex game
     // you'll want to track the active shader and activate/deactivate it as necessary
     shader_->activate();
+    aout << "initRenderer: shader activated" << std::endl;
 
     // setup any other gl related global states
     glClearColor(CORNFLOWER_BLUE);
@@ -359,6 +382,8 @@ void Renderer::initRenderer() {
     if (pVert) glDeleteShader(pVert);
     if (pFrag) glDeleteShader(pFrag);
 
+    aout << "initRenderer: particle program linked, id=" << particleProgram_ << std::endl;
+
     // create quad VBO (two triangles unit quad)
     float quadVerts[] = {
         // x,y, u,v
@@ -376,6 +401,8 @@ void Renderer::initRenderer() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIBO_);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIdx), quadIdx, GL_STATIC_DRAW);
 
+    aout << "initRenderer: VBO/IBO created" << std::endl;
+
     // instance buffer (dynamic)
     glGenBuffers(1, &instanceVBO_);
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO_);
@@ -385,8 +412,12 @@ void Renderer::initRenderer() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    // get some demo models into memory
+    aout << "initRenderer: instance VBO created" << std::endl;
+
+    // get some demo models into memory (safe when app_ is null)
     createModels();
+
+    aout << "initRenderer: createModels returned" << std::endl;
 
     // create simple 1x1 white texture for HUD
     {
@@ -400,8 +431,11 @@ void Renderer::initRenderer() {
         hudTexture_ = TextureAsset::fromTextureId(tex);
     }
 
+    aout << "initRenderer: HUD texture created" << std::endl;
+
     // create font atlas by calling MainActivity.createFontAtlas via JNI
     if (app_ && app_->activity && app_->activity->vm) {
+        aout << "initRenderer: attempting to create font atlas via JNI" << std::endl;
         JNIEnv* env = nullptr;
         app_->activity->vm->AttachCurrentThread(&env, nullptr);
         if (env) {
@@ -442,9 +476,26 @@ void Renderer::createModels() {
             Vertex(Vector3{1, -1, 0}, Vector2{0, 1}) // 3
     };
     std::vector<Index> indices = {0,1,2,0,2,3};
-    auto assetManager = app_->activity->assetManager;
-    spTileTexture_ = TextureAsset::loadAsset(assetManager, "android_robot.png");
-    tileTemplate_ = Model(vertices, indices, spTileTexture_);
+    if (app_ && app_->activity) {
+        auto assetManager = app_->activity->assetManager;
+        spTileTexture_ = TextureAsset::loadAsset(assetManager, "android_robot.png");
+        tileTemplate_ = Model(vertices, indices, spTileTexture_);
+    } else {
+        // Fallback: reuse hudTexture_ (1x1 white) to avoid dereferencing app_
+        if (!hudTexture_) {
+            // create a temporary 1x1 white texture just in case
+            GLuint tex;
+            glGenTextures(1, &tex);
+            glBindTexture(GL_TEXTURE_2D, tex);
+            uint8_t pixel[4] = {255,255,255,255};
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            hudTexture_ = TextureAsset::fromTextureId(tex);
+        }
+        spTileTexture_ = hudTexture_;
+        tileTemplate_ = Model(vertices, indices, spTileTexture_);
+    }
 
     // keep models_ initially empty; renderBoard will reuse tileTemplate_
 }

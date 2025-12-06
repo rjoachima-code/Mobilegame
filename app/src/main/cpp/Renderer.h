@@ -22,7 +22,23 @@ public:
             context_(EGL_NO_CONTEXT),
             width_(0),
             height_(0),
-            shaderNeedsNewProjectionMatrix_(true) {
+            shaderNeedsNewProjectionMatrix_(true),
+            window_(nullptr),
+            ownsWindow_(false) {
+        initRenderer();
+    }
+
+    // Alternate constructor: create renderer directly from ANativeWindow*
+    inline Renderer(ANativeWindow* window) :
+            app_(nullptr),
+            display_(EGL_NO_DISPLAY),
+            surface_(EGL_NO_SURFACE),
+            context_(EGL_NO_CONTEXT),
+            width_(0),
+            height_(0),
+            shaderNeedsNewProjectionMatrix_(true),
+            window_(window),
+            ownsWindow_(true) {
         initRenderer();
     }
 
@@ -94,6 +110,10 @@ private:
     GLuint quadVBO_ = 0;
     GLuint quadIBO_ = 0;
     GLuint instanceVBO_ = 0;
+
+    // If created from a raw ANativeWindow, keep it here
+    ANativeWindow* window_ = nullptr;
+    bool ownsWindow_ = false;
 };
 
 #endif //ANDROIDGLINVESTIGATIONS_RENDERER_H

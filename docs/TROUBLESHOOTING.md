@@ -33,8 +33,9 @@ This guide helps resolve common issues when building and testing JACAMENO on And
    ```
 
 5. **Check Gradle Version**
-   - The project uses Gradle 8.13
-   - Android Studio should download this automatically
+   - The project uses Gradle wrapper 8.13 (build tool)
+   - Android Gradle Plugin (AGP): 7.4.2 (for Android builds)
+   - Android Studio should download these automatically
 
 ### "SDK location not found"
 

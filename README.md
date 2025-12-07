@@ -73,10 +73,37 @@ Assets/
 
 ## Requirements
 
-- Unity 2021.3 LTS or later
-- TextMesh Pro package
+- Unity 2021.3 LTS or later (for Unity-based development)
+- TextMesh Pro package (for Unity)
+- **OR** Android Studio (for native C++ development - current implementation)
 
-## Getting Started
+## Project Status
+
+**This project currently has TWO implementations:**
+
+1. **Unity Implementation** (Assets/ folder) - Original design with Unity scenes and scripts
+2. **Native Android Implementation** (app/ folder) - C++ native implementation using Android Game SDK
+
+The **native Android implementation is ready for testing** and can be built directly in Android Studio without Unity.
+
+## Quick Start: Testing on Android (Native Implementation)
+
+**⚡ Fastest way to test the game on Android devices:**
+
+See [docs/QUICK_START_ANDROID.md](docs/QUICK_START_ANDROID.md) for a 5-minute setup guide.
+
+**Summary:**
+1. Install Android Studio
+2. Open this project in Android Studio
+3. Connect an Android device or start an emulator
+4. Click Run ▶
+5. Game will install and launch!
+
+For complete build instructions, see [docs/ANDROID_BUILD_INSTRUCTIONS.md](docs/ANDROID_BUILD_INSTRUCTIONS.md).
+
+For deployment checklist, see [docs/ANDROID_DEPLOYMENT_CHECKLIST.md](docs/ANDROID_DEPLOYMENT_CHECKLIST.md).
+
+## Getting Started (Unity)
 
 1. Clone this repository
 2. Open the project in Unity
@@ -84,6 +111,48 @@ Assets/
 4. Press Play to test the game
 
 ## Building
+
+### Android Native Build (Current Implementation - READY FOR TESTING)
+
+**The project is now configured and ready for Android testing!**
+
+#### What's Been Configured:
+- ✅ Package name: `com.jacameno.mobilegame`
+- ✅ App name: JACAMENO
+- ✅ Native library: `jacameno` (C++ implementation)
+- ✅ Minimum SDK: API 22 (Android 5.1 - covers 99% of devices)
+- ✅ Target SDK: API 34 (Android 14)
+- ✅ All source files properly configured in CMakeLists.txt
+- ✅ MainActivity and native bridge set up
+- ✅ Touch input handling via GameActivity
+- ✅ Audio support with fallback
+- ✅ Full-screen immersive mode
+
+#### Build in Android Studio:
+1. Open the project root in Android Studio
+2. Let Gradle sync (may take a few minutes first time)
+3. Connect device or start emulator
+4. Click Run ▶
+5. APK builds, installs, and launches automatically
+
+See [docs/QUICK_START_ANDROID.md](docs/QUICK_START_ANDROID.md) for detailed walkthrough.
+
+#### Build from Command Line:
+```bash
+# Debug APK
+./gradlew assembleDebug
+
+# Release APK (requires signing configuration)
+./gradlew assembleRelease
+
+# Install to connected device
+./gradlew installDebug
+
+# Build and install
+./gradlew installDebug
+```
+
+Output APK location: `app/build/outputs/apk/debug/app-debug.apk`
 
 ### Android (Direct APK Build)
 1. File > Build Settings

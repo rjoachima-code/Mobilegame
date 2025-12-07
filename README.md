@@ -2,6 +2,13 @@
 
 A Unity mobile game combining M2 Block and Tetris mechanics with a neon minimal art style.
 
+## 🎮 Play Now
+
+**Web Version Available!** Play JACAMENO directly in your browser:
+- 📱 **[Open web/index.html](web/index.html)** in any browser
+- 🌐 **No installation required** - works on desktop and mobile
+- 🎯 **Quick Start**: See [web/README.md](web/README.md) for instructions
+
 ## Game Overview
 
 JACAMENO is a unique puzzle game that combines:
@@ -79,14 +86,37 @@ Assets/
 
 ## Project Status
 
-**This project currently has TWO implementations:**
+**This project currently has THREE implementations:**
 
-1. **Unity Implementation** (Assets/ folder) - Original design with Unity scenes and scripts
-2. **Native Android Implementation** (app/ folder) - C++ native implementation using Android Game SDK
+1. **Web Version** (web/ folder) - HTML5/JavaScript implementation that runs in any browser
+   - ✅ **Ready to play now!** Just open `web/index.html`
+   - ✅ Works on desktop and mobile browsers
+   - ✅ No installation required
+   - See [web/README.md](web/README.md) for details
 
-The **native Android implementation is ready for testing** and can be built directly in Android Studio without Unity.
+2. **Unity Implementation** (Assets/ folder) - Original design with Unity scenes and scripts
+   - For Unity-based development and builds
 
-## Quick Start: Testing on Android (Native Implementation)
+3. **Native Android Implementation** (app/ folder) - C++ native implementation using Android Game SDK
+   - ✅ **Ready for testing** in Android Studio
+   - For high-performance native Android builds
+
+## Quick Start Options
+
+### 🌐 Play in Browser (Easiest - No Installation)
+
+```bash
+# Open the web version
+cd web
+python3 -m http.server 8000
+# Then open: http://localhost:8000
+```
+
+Or simply open `web/index.html` in your browser!
+
+See [web/README.md](web/README.md) for full instructions.
+
+### 📱 Testing on Android (Native Implementation)
 
 **⚡ Fastest way to test the game on Android devices:**
 

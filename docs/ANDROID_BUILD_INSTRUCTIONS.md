@@ -211,7 +211,7 @@ Or in Android Studio:
 ### App Crashes on Launch
 - Check Logcat for error messages
 - Common issues:
-  - Missing native library: Ensure `libja cameno.so` is built
+  - Missing native library: Ensure `libjacameno.so` is built
   - Missing assets: Ensure all required assets are in `src/main/assets`
   - Permissions: Check AndroidManifest.xml for required permissions
 

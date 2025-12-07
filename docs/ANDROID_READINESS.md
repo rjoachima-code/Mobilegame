@@ -15,7 +15,7 @@ The JACAMENO game is **fully configured** and ready to be built and tested on An
 2. **Application Identity**
    - App name: "JACAMENO"
    - Project name: "JACAMENO"  
-   - Native library: `libja cameno.so`
+   - Native library: `libjacameno.so`
 
 3. **Android Configuration**
    - Minimum SDK: API 22 (Android 5.1) - 99% device coverage
@@ -175,3 +175,20 @@ The native C++ implementation is complete and properly integrated with the Andro
 *Configuration completed on: December 7, 2024*
 *Ready for: Android testing and development*
 *Next milestone: First successful build and test run*
+
+## Note on Gradle Configuration
+
+The project uses Gradle's version catalog feature (defined in `gradle/libs.versions.toml`) for dependency management. The root `build.gradle.kts` currently has hardcoded versions as a fallback due to environment limitations during initial setup.
+
+**In a production environment with proper internet access:**
+- The version catalog approach will work seamlessly
+- Dependencies will be resolved from Google Maven repository
+- The commented-out code in `build.gradle.kts` shows the preferred approach
+
+**Current configuration:**
+- Android Gradle Plugin: 7.4.2
+- Kotlin: 1.8.0
+- These are stable, well-tested versions
+
+**Upgrading:**
+To use newer versions, update `gradle/libs.versions.toml` and uncomment the version catalog usage in `build.gradle.kts`.

@@ -4,15 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.myapplication"
-    compileSdk {
-        version = release(36)
-    }
+    namespace = "com.jacameno.mobilegame"
+    compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.myapplication"
-        minSdk = 35
-        targetSdk = 36
+        applicationId = "com.jacameno.mobilegame"
+        minSdk = 22
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 

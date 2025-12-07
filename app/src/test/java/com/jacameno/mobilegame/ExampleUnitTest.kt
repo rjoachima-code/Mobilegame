@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.jacameno.mobilegame
 
 import org.junit.Test
 

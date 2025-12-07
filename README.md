@@ -284,6 +284,49 @@ These templates are automatically used when exporting to Android Studio, ensurin
 4. Click Build to generate Xcode project
 5. Open in Xcode and build/deploy
 
+## Android Testing Documentation
+
+Comprehensive guides are available in the `docs/` folder:
+
+- **📘 [Quick Start Guide](docs/QUICK_START_ANDROID.md)** - Get up and running in 5 minutes
+- **📗 [Complete Build Instructions](docs/ANDROID_BUILD_INSTRUCTIONS.md)** - All build options and configurations
+- **📙 [Deployment Checklist](docs/ANDROID_DEPLOYMENT_CHECKLIST.md)** - Pre-release requirements
+- **📕 [Readiness Summary](docs/ANDROID_READINESS.md)** - Current status and what's completed
+- **🔧 [Troubleshooting Guide](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+
+### What's Ready for Android Testing
+
+✅ **Fully Configured:**
+- Package name: `com.jacameno.mobilegame`
+- Native C++ game implementation with GameActivity
+- Touch input handling
+- Audio support
+- OpenGL ES rendering
+- Full-screen immersive mode
+- Build scripts and Gradle configuration
+
+✅ **Ready to Build:**
+```bash
+# Open in Android Studio and click Run ▶
+# Or use command line:
+./gradlew assembleDebug
+```
+
+✅ **Documentation:**
+- Complete setup guides
+- Build instructions
+- Deployment checklist
+- Troubleshooting guide
+
+**Next Step:** Follow the [Quick Start Guide](docs/QUICK_START_ANDROID.md) to build and test!
+
+## Development Tips
+1. File > Build Settings
+2. Select iOS platform
+3. Configure Player Settings
+4. Click Build to generate Xcode project
+5. Open in Xcode and build/deploy
+
 ## Development Tips
 
 ### Testing on Android Device

@@ -84,6 +84,9 @@ class Game {
     }
     
     initControls() {
+        // Touch gesture thresholds
+        const TOUCH_TAP_THRESHOLD = 30; // pixels
+        
         // Keyboard controls
         document.addEventListener('keydown', (e) => {
             if (this.isGameOver || this.isPaused) {
@@ -150,7 +153,7 @@ class Game {
             const dx = touchEndX - touchStartX;
             const dy = touchEndY - touchStartY;
             
-            if (Math.abs(dx) < 30 && Math.abs(dy) < 30) {
+            if (Math.abs(dx) < TOUCH_TAP_THRESHOLD && Math.abs(dy) < TOUCH_TAP_THRESHOLD) {
                 // Tap - rotate
                 this.rotatePiece();
             } else if (Math.abs(dx) > Math.abs(dy)) {
@@ -219,12 +222,18 @@ class Game {
         return false;
     }
     
+    rotateMatrix(matrix) {
+        // Rotate matrix 90 degrees clockwise
+        // Transpose and reverse each row
+        return matrix[0].map((_, i) =>
+            matrix.map(row => row[i]).reverse()
+        );
+    }
+    
     rotatePiece() {
         if (!this.currentPiece) return;
         
-        const rotated = this.currentPiece.shape[0].map((_, i) =>
-            this.currentPiece.shape.map(row => row[i]).reverse()
-        );
+        const rotated = this.rotateMatrix(this.currentPiece.shape);
         
         const originalShape = this.currentPiece.shape;
         this.currentPiece.shape = rotated;
@@ -287,11 +296,15 @@ class Game {
     }
     
     checkMerges() {
+        const MAX_MERGE_ITERATIONS = 10; // Prevent infinite loops
         let mergeOccurred = true;
+        let iterations = 0;
         
-        while (mergeOccurred) {
+        while (mergeOccurred && iterations < MAX_MERGE_ITERATIONS) {
             mergeOccurred = false;
+            iterations++;
             
+            // Check horizontal merges
             for (let row = 0; row < this.rows; row++) {
                 for (let col = 0; col < this.cols - 1; col++) {
                     if (this.grid[row][col].value > 0 && 
@@ -305,6 +318,7 @@ class Game {
                 }
             }
             
+            // Check vertical merges
             for (let row = 0; row < this.rows - 1; row++) {
                 for (let col = 0; col < this.cols; col++) {
                     if (this.grid[row][col].value > 0 && 

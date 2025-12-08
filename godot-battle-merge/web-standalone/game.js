@@ -310,7 +310,7 @@ class BattleMergeGame {
     
     useSwap() {
         if (this.coins < this.economy.swap) {
-            alert('Not enough coins!');
+            this.showNotification('Not enough coins!', '#ff0000');
             return;
         }
         
@@ -319,12 +319,13 @@ class BattleMergeGame {
         this.currentBlock = this.nextBlock;
         this.nextBlock = temp;
         this.updateUI();
+        this.showNotification('Blocks swapped!', '#00ffff');
         console.log('Swapped blocks');
     }
     
     useSledgehammer() {
         if (this.coins < this.economy.sledgehammer) {
-            alert('Not enough coins!');
+            this.showNotification('Not enough coins!', '#ff0000');
             return;
         }
         
@@ -332,13 +333,13 @@ class BattleMergeGame {
         this.itemMode = 'hammer';
         this.canvas.style.cursor = 'crosshair';
         this.updateUI();
-        alert('Click a block to remove it');
+        this.showNotification('Click a block to remove it', '#ff6600');
     }
     
     applySledgehammer(col, row) {
         if (this.grid[col][row] === 0) {
             this.coins += this.economy.sledgehammer; // Refund
-            alert('No block at that position');
+            this.showNotification('No block at that position', '#ff0000');
             return;
         }
         
@@ -346,24 +347,26 @@ class BattleMergeGame {
         this.applyGravity(col);
         this.updateUI();
         this.draw();
+        this.showNotification('Block destroyed!', '#ff6600');
         console.log('Sledgehammer used at', col, row);
     }
     
     useJoker() {
         if (this.coins < this.economy.joker) {
-            alert('Not enough coins!');
+            this.showNotification('Not enough coins!', '#ff0000');
             return;
         }
         
         this.coins -= this.economy.joker;
         this.nextIsJoker = true;
         this.updateUI();
+        this.showNotification('Next block is a Joker!', '#ff00ff');
         console.log('Next block is a Joker');
     }
     
     useNuke() {
         if (this.coins < this.economy.nuke) {
-            alert('Not enough coins!');
+            this.showNotification('Not enough coins!', '#ff0000');
             return;
         }
         
@@ -371,7 +374,7 @@ class BattleMergeGame {
         this.itemMode = 'nuke';
         this.canvas.style.cursor = 'crosshair';
         this.updateUI();
-        alert('Click a column to nuke it');
+        this.showNotification('Click a column to nuke it', '#ff0000');
     }
     
     applyNuke(col) {
@@ -433,6 +436,48 @@ class BattleMergeGame {
         console.log('Game restarted');
     }
     
+    showNotification(message, color) {
+        // Create notification element if it doesn't exist
+        let notification = document.getElementById('notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(10, 10, 30, 0.95);
+                border: 2px solid ${color};
+                border-radius: 10px;
+                padding: 20px 40px;
+                font-size: 20px;
+                font-weight: bold;
+                color: ${color};
+                text-shadow: 0 0 10px ${color};
+                box-shadow: 0 0 20px ${color};
+                z-index: 2000;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.3s;
+            `;
+            document.body.appendChild(notification);
+        }
+        
+        // Update and show notification
+        notification.textContent = message;
+        notification.style.borderColor = color;
+        notification.style.color = color;
+        notification.style.textShadow = `0 0 10px ${color}`;
+        notification.style.boxShadow = `0 0 20px ${color}`;
+        notification.style.opacity = '1';
+        
+        // Hide after 2 seconds
+        setTimeout(() => {
+            notification.style.opacity = '0';
+        }, 2000);
+    }
+    
     updateUI() {
         document.getElementById('score').textContent = this.score;
         document.getElementById('coins').textContent = this.coins;
@@ -489,6 +534,7 @@ class BattleMergeGame {
         const y = this.GRID_OFFSET_Y + row * this.CELL_SIZE;
         const padding = 5;
         
+        // Negative values represent virus blocks
         const isVirus = value < 0;
         const absValue = Math.abs(value);
         

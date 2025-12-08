@@ -110,6 +110,9 @@ namespace Jacameno
 
                 if (mergeMechanic != null)
                 {
+                    // Record number of shapes merged for scoring
+                    int shapesInvolved = toMerge.Count;
+                    
                     // Use MergeMechanic coroutine to animate merge and spawn result
                     StartCoroutine(mergeMechanic.ProcessMerge(toMerge, result, shapePrefab, shapesParent, (spawned) => {
                         if (spawned != null)
@@ -118,6 +121,12 @@ namespace Jacameno
                             columns[colIndex].Add(spawned);
                             spawned.MoveToPosition(new Vector3(GetColumnX(colIndex), GetTargetY(colIndex), 0f));
                             spawned.PlaySquishAnimation();
+
+                            // Award score for merge
+                            if (OctagonScoreManager.Instance != null && result != null)
+                            {
+                                OctagonScoreManager.Instance.AddMergeScore(result, shapesInvolved);
+                            }
 
                             // After spawning, run another check for chain merges
                             StartCoroutine(DelayedMergeCheck(colIndex));
@@ -139,6 +148,12 @@ namespace Jacameno
                         columns[colIndex].Add(sc);
                         sc.MoveToPosition(new Vector3(GetColumnX(colIndex), GetTargetY(colIndex), 0f));
                         sc.PlaySquishAnimation();
+
+                        // Award score for merge
+                        if (OctagonScoreManager.Instance != null && result != null)
+                        {
+                            OctagonScoreManager.Instance.AddMergeScore(result, toMerge.Count);
+                        }
 
                         MagnetCheck(colIndex, result);
                     }

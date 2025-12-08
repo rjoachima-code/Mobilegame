@@ -28,6 +28,10 @@ class Game {
         this.isGameOver = false;
         this.highScore = this.loadHighScore();
         
+        // Initialize geometric sprite renderer
+        this.renderer = new GeometricRenderer(this.ctx);
+        this.nextRenderer = new GeometricRenderer(this.nextCtx);
+        
         this.initGrid();
         this.initControls();
         this.initTetrominoes();
@@ -478,11 +482,13 @@ class Game {
     }
     
     draw() {
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        // Dark cyberpunk background
+        this.ctx.fillStyle = '#0a0a0f';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // Draw grid
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        // Draw subtle grid with neon accent
+        this.ctx.strokeStyle = 'rgba(0, 212, 255, 0.1)';
+        this.ctx.lineWidth = 0.5;
         for (let row = 0; row <= this.rows; row++) {
             this.ctx.beginPath();
             this.ctx.moveTo(0, row * this.blockSize);
@@ -496,7 +502,7 @@ class Game {
             this.ctx.stroke();
         }
         
-        // Draw locked blocks
+        // Draw locked blocks with geometric shapes
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.cols; col++) {
                 if (this.grid[row][col].value > 0) {
@@ -505,7 +511,7 @@ class Game {
             }
         }
         
-        // Draw current piece
+        // Draw current piece with geometric shapes
         if (this.currentPiece) {
             for (let row = 0; row < this.currentPiece.shape.length; row++) {
                 for (let col = 0; col < this.currentPiece.shape[row].length; col++) {
@@ -526,24 +532,13 @@ class Game {
         const px = x * this.blockSize;
         const py = y * this.blockSize;
         
-        this.ctx.fillStyle = color;
-        this.ctx.fillRect(px + 2, py + 2, this.blockSize - 4, this.blockSize - 4);
-        
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(px + 2, py + 2, this.blockSize - 4, this.blockSize - 4);
-        
-        if (value) {
-            this.ctx.fillStyle = 'white';
-            this.ctx.font = 'bold 16px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
-            this.ctx.fillText(value, px + this.blockSize / 2, py + this.blockSize / 2);
-        }
+        // Use geometric renderer for cyberpunk aesthetic
+        this.renderer.drawShape(px, py, this.blockSize, value);
     }
     
     drawNextPiece() {
-        this.nextCtx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        // Dark cyberpunk background
+        this.nextCtx.fillStyle = '#0a0a0f';
         this.nextCtx.fillRect(0, 0, this.nextCanvas.width, this.nextCanvas.height);
         
         if (!this.nextPiece) return;
@@ -552,14 +547,14 @@ class Game {
         const offsetX = (this.nextCanvas.width - this.nextPiece.shape[0].length * blockSize) / 2;
         const offsetY = (this.nextCanvas.height - this.nextPiece.shape.length * blockSize) / 2;
         
+        // Draw with geometric renderer
         for (let row = 0; row < this.nextPiece.shape.length; row++) {
             for (let col = 0; col < this.nextPiece.shape[row].length; col++) {
                 if (this.nextPiece.shape[row][col]) {
                     const px = offsetX + col * blockSize;
                     const py = offsetY + row * blockSize;
                     
-                    this.nextCtx.fillStyle = this.nextPiece.color;
-                    this.nextCtx.fillRect(px + 2, py + 2, blockSize - 4, blockSize - 4);
+                    this.nextRenderer.drawShape(px, py, blockSize, this.nextPiece.value);
                 }
             }
         }

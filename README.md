@@ -2,12 +2,24 @@
 
 A Unity mobile game combining M2 Block and Tetris mechanics with a neon minimal art style.
 
+## 🚀 Beta Testing Now Open!
+
+**JACAMENO is ready for beta testing!** We welcome your feedback to make the game even better.
+
+- 📖 **[Beta Testing Guide](docs/BETA_TESTING_GUIDE.md)** - How to help test the game
+- 🐛 **[Report Bugs](https://github.com/rjoachima-code/Mobilegame/issues/new?template=bug_report.md)** - Found an issue? Let us know!
+- 💡 **[Suggest Features](https://github.com/rjoachima-code/Mobilegame/issues/new?template=feature_request.md)** - Have ideas? We'd love to hear them!
+- 📝 **[Changelog](CHANGELOG.md)** - See what's new in version 0.9.0
+
 ## 🎮 Play Now
 
 **Web Version Available!** Play JACAMENO directly in your browser:
-- 📱 **[Open web/index.html](web/index.html)** in any browser
-- 🌐 **No installation required** - works on desktop and mobile
+- 🌐 **[Play Online](https://rjoachima-code.github.io/Mobilegame/)** - Live demo on GitHub Pages!
+- 📱 **[Open web/index.html](web/index.html)** in any browser for local play
+- 🚀 **No installation required** - works on desktop and mobile
 - 🎯 **Quick Start**: See [web/README.md](web/README.md) for instructions
+- ⭐ **NEW**: High scores now save automatically!
+- 🔊 **NEW**: Sound effects added!
 
 ## Game Overview
 

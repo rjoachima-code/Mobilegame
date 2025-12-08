@@ -26,10 +26,113 @@ class Game {
         this.lastDropTime = 0;
         this.isPaused = false;
         this.isGameOver = false;
+        this.highScore = this.loadHighScore();
         
         this.initGrid();
         this.initControls();
         this.initTetrominoes();
+        this.initSounds();
+    }
+    
+    initSounds() {
+        // Audio context initialized lazily on first user interaction
+        this.audioContext = null;
+        this.soundsEnabled = true;
+    }
+    
+    ensureAudioContext() {
+        if (!this.soundsEnabled) return false;
+        
+        if (!this.audioContext) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                this.audioContext = new AudioContext();
+                
+                // Resume context if it's suspended (browser autoplay policy)
+                if (this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+            } catch (e) {
+                console.log('Web Audio API not supported');
+                this.soundsEnabled = false;
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    playSound(type) {
+        if (!this.ensureAudioContext()) return;
+        
+        const ctx = this.audioContext;
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        
+        switch(type) {
+            case 'move':
+                oscillator.frequency.value = 200;
+                gainNode.gain.value = 0.1;
+                oscillator.start();
+                oscillator.stop(ctx.currentTime + 0.05);
+                break;
+            case 'rotate':
+                oscillator.frequency.value = 300;
+                gainNode.gain.value = 0.1;
+                oscillator.start();
+                oscillator.stop(ctx.currentTime + 0.05);
+                break;
+            case 'drop':
+                oscillator.frequency.value = 100;
+                gainNode.gain.value = 0.15;
+                oscillator.start();
+                oscillator.stop(ctx.currentTime + 0.1);
+                break;
+            case 'merge':
+                oscillator.frequency.value = 400;
+                gainNode.gain.value = 0.15;
+                oscillator.start();
+                oscillator.stop(ctx.currentTime + 0.15);
+                break;
+            case 'line':
+                oscillator.frequency.value = 600;
+                gainNode.gain.value = 0.2;
+                oscillator.start();
+                oscillator.stop(ctx.currentTime + 0.2);
+                break;
+            case 'gameover':
+                oscillator.frequency.value = 150;
+                oscillator.type = 'sawtooth';
+                gainNode.gain.value = 0.2;
+                oscillator.start();
+                oscillator.stop(ctx.currentTime + 0.5);
+                break;
+        }
+    }
+    
+    loadHighScore() {
+        try {
+            const saved = localStorage.getItem('jacameno_highscore');
+            return saved ? parseInt(saved) : 0;
+        } catch (e) {
+            console.log('localStorage not available');
+            return 0;
+        }
+    }
+    
+    saveHighScore() {
+        try {
+            if (this.score > this.highScore) {
+                this.highScore = this.score;
+                localStorage.setItem('jacameno_highscore', this.highScore.toString());
+                return true;
+            }
+        } catch (e) {
+            console.log('Could not save high score');
+        }
+        return false;
     }
     
     initGrid() {
@@ -212,6 +315,7 @@ class Game {
         if (!this.checkCollision(this.currentPiece, newX, newY)) {
             this.currentPiece.x = newX;
             this.currentPiece.y = newY;
+            if (dx !== 0) this.playSound('move');
             return true;
         }
         
@@ -240,6 +344,8 @@ class Game {
         
         if (this.checkCollision(this.currentPiece, this.currentPiece.x, this.currentPiece.y)) {
             this.currentPiece.shape = originalShape;
+        } else {
+            this.playSound('rotate');
         }
     }
     
@@ -249,6 +355,7 @@ class Game {
         while (this.movePiece(0, 1)) {
             this.score += 2;
         }
+        this.playSound('drop');
     }
     
     checkCollision(piece, x, y) {
@@ -314,6 +421,7 @@ class Game {
                         this.grid[row][col + 1].color = null;
                         this.score += this.grid[row][col].value;
                         mergeOccurred = true;
+                        this.playSound('merge');
                     }
                 }
             }
@@ -328,6 +436,7 @@ class Game {
                         this.grid[row + 1][col].color = null;
                         this.score += this.grid[row][col].value;
                         mergeOccurred = true;
+                        this.playSound('merge');
                     }
                 }
             }
@@ -351,6 +460,7 @@ class Game {
             this.score += linesCleared * 100 * this.level;
             this.level = Math.floor(this.lines / 10) + 1;
             this.dropInterval = Math.max(100, 1000 - (this.level - 1) * 50);
+            this.playSound('line');
         }
     }
     
@@ -459,6 +569,7 @@ class Game {
         document.getElementById('score').textContent = this.score;
         document.getElementById('level').textContent = this.level;
         document.getElementById('lines').textContent = this.lines;
+        document.getElementById('high-score').textContent = this.highScore;
     }
     
     start() {
@@ -502,7 +613,14 @@ class Game {
     
     gameOver() {
         this.isGameOver = true;
+        const isNewHighScore = this.saveHighScore();
         document.getElementById('final-score').textContent = this.score;
+        if (isNewHighScore) {
+            document.getElementById('new-high-score').style.display = 'block';
+        } else {
+            document.getElementById('new-high-score').style.display = 'none';
+        }
+        this.playSound('gameover');
         showScreen('gameover-screen');
     }
 }
@@ -515,15 +633,41 @@ function showScreen(screenId) {
     document.getElementById(screenId).classList.add('active');
 }
 
+function showError(message) {
+    document.getElementById('error-message').textContent = message;
+    document.getElementById('error-screen').style.display = 'flex';
+}
+
+function hideError() {
+    document.getElementById('error-screen').style.display = 'none';
+}
+
 // Initialize game
 let game = null;
 
-document.getElementById('start-btn').addEventListener('click', () => {
-    if (!game) {
-        game = new Game();
+// Initialize high score display on page load
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const savedHighScore = localStorage.getItem('jacameno_highscore');
+        if (savedHighScore) {
+            document.getElementById('high-score').textContent = savedHighScore;
+        }
+    } catch (e) {
+        console.log('Could not load high score');
     }
-    game.start();
-    showScreen('game-screen');
+});
+
+document.getElementById('start-btn').addEventListener('click', () => {
+    try {
+        if (!game) {
+            game = new Game();
+        }
+        game.start();
+        showScreen('game-screen');
+    } catch (error) {
+        console.error('Error starting game:', error);
+        showError('Failed to start game. Please refresh the page and try again.');
+    }
 });
 
 document.getElementById('pause-btn').addEventListener('click', () => {
@@ -553,5 +697,10 @@ document.getElementById('play-again-btn').addEventListener('click', () => {
 });
 
 document.getElementById('menu-btn-2').addEventListener('click', () => {
+    showScreen('menu-screen');
+});
+
+document.getElementById('error-close-btn').addEventListener('click', () => {
+    hideError();
     showScreen('menu-screen');
 });

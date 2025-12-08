@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 namespace Jacameno
 {
@@ -229,7 +230,7 @@ namespace Jacameno
             return score.ToString();
         }
 
-        private System.Collections.IEnumerator PopAnimation(Transform target)
+        private IEnumerator PopAnimation(Transform target)
         {
             if (target == null)
             {

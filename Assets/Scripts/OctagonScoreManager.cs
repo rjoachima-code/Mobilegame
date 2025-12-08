@@ -23,6 +23,10 @@ namespace Jacameno
         [Header("Level Settings")]
         [SerializeField] private int pointsPerLevel = 1000;
         [SerializeField] private int maxLevel = 20;
+        [SerializeField] private int levelUpBonus = 100; // Multiplied by level number
+        
+        [Header("Combo Settings")]
+        [SerializeField] private int comboBonusPerLevel = 50; // Multiplied by combo count
 
         private int score = 0;
         private int highScore = 0;
@@ -138,7 +142,7 @@ namespace Jacameno
                 OnLevelChanged?.Invoke(level);
                 
                 // Bonus for leveling up
-                AddScore(level * 100);
+                AddScore(level * levelUpBonus);
             }
         }
 
@@ -150,7 +154,7 @@ namespace Jacameno
             if (comboCount > 1)
             {
                 // Award combo bonus
-                int comboBonus = comboCount * 50;
+                int comboBonus = comboCount * comboBonusPerLevel;
                 AddScore(comboBonus);
             }
             

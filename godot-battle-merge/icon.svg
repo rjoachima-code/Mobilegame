@@ -1,0 +1,7 @@
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" fill="#0d0d26"/>
+  <rect x="20" y="20" width="88" height="88" fill="#00ffff" opacity="0.3"/>
+  <rect x="30" y="30" width="68" height="68" fill="#ff00ff" opacity="0.3"/>
+  <rect x="40" y="40" width="48" height="48" fill="#ffff00" opacity="0.3"/>
+  <text x="64" y="85" font-family="Arial" font-size="32" fill="#ffffff" text-anchor="middle" font-weight="bold">BM</text>
+</svg>

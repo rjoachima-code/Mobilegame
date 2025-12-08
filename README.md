@@ -13,6 +13,7 @@ This repository contains a native Android game written in C++ using Google GameA
 
 ## 🎮 Play Now
 
+### JACAMENO (Octagon Merge)
 **Web Version Available!** Play JACAMENO directly in your browser:
 - 🌐 **[Play Online](https://rjoachima-code.github.io/Mobilegame/)** - Live demo on GitHub Pages!
 - 📱 **[Open web/index.html](web/index.html)** in any browser for local play
@@ -20,6 +21,14 @@ This repository contains a native Android game written in C++ using Google GameA
 - 🎯 **Quick Start**: See [web/README.md](web/README.md) for instructions
 - ⭐ **NEW**: High scores now save automatically!
 - 🔊 **NEW**: Sound effects added!
+
+### Battle Merge (Godot 4) 🆕
+**NEW: Defense-themed merge game!** Play the neon cyberpunk Battle Merge game:
+- 🎮 **[Play Web Version](godot-battle-merge/web-standalone/index.html)** - Instant browser play!
+- 🔥 **M2 Block mechanics** + Lane Defense gameplay
+- 💰 **Economy system** with purchasable items
+- 🌈 **Neon cyberpunk** visual theme
+- 📖 **[Complete Guide](godot-battle-merge/README.md)** - How to play and features
 
 ## 🎮 Game Overview
 
@@ -84,15 +93,22 @@ Assets/
 
 ## Project Status
 
-**This project currently has THREE implementations:**
+**This project currently has FOUR implementations:**
 
-1. **Web Version** (web/ folder) - HTML5/JavaScript implementation that runs in any browser
+1. **Web Version - JACAMENO** (web/ folder) - HTML5/JavaScript octagon merge game
    - ✅ **Ready to play now!** Just open `web/index.html`
    - ✅ Works on desktop and mobile browsers
    - ✅ No installation required
    - See [web/README.md](web/README.md) for details
 
-2. **Unity Implementation** (Assets/ folder) - Original design with Unity scenes and scripts
+2. **Godot 4 - Battle Merge** (godot-battle-merge/ folder) - NEW! Defense-themed merge game
+   - ✅ **Play instantly!** Open `godot-battle-merge/web-standalone/index.html`
+   - ✅ M2 Block mechanics + Lane Defense
+   - ✅ Neon cyberpunk theme with economy system
+   - ✅ Full Godot 4 project included for mobile export
+   - See [godot-battle-merge/README.md](godot-battle-merge/README.md) for details
+
+3. **Unity Implementation** (Assets/ folder) - Original design with Unity scenes and scripts
    - For Unity-based development and builds
 
 3. **Native Android Implementation** (app/ folder) - C++ native implementation using Android Game SDK
@@ -103,6 +119,7 @@ Assets/
 
 ### 🌐 Play in Browser (Easiest - No Installation)
 
+**Option 1: JACAMENO (Octagon Merge)**
 ```bash
 # Open the web version
 cd web
@@ -112,7 +129,17 @@ python3 -m http.server 8000
 
 Or simply open `web/index.html` in your browser!
 
-See [web/README.md](web/README.md) for full instructions.
+**Option 2: Battle Merge (Defense Game)** 🆕
+```bash
+# Open the Battle Merge web version
+cd godot-battle-merge/web-standalone
+python3 -m http.server 8000
+# Then open: http://localhost:8000
+```
+
+Or simply open `godot-battle-merge/web-standalone/index.html` in your browser!
+
+See [web/README.md](web/README.md) and [godot-battle-merge/README.md](godot-battle-merge/README.md) for full instructions.
 
 ### 📱 Testing on Android (Native Implementation)
 

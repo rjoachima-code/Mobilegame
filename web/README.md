@@ -1,5 +1,11 @@
 # JACAMENO Web Version
 
+> ⚠️ **IMPORTANT NOTE**: This web version currently implements the old Tetris-based gameplay. 
+> The Unity version has been updated to the new **Octagon Merge Game** concept (M2 Block style with no rotation).
+> 
+> **Future Update Planned**: This web version will be updated to match the new octagon merge gameplay.
+> For details on the new game concept, see [../OCTAGON_MERGE_GAME.md](../OCTAGON_MERGE_GAME.md)
+
 This is the browser-based version of JACAMENO that can be played directly in any modern web browser.
 
 ## 🆕 What's New in Latest Version

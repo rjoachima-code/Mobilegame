@@ -3,8 +3,18 @@ using UnityEngine;
 namespace JACAMENO
 {
     /// <summary>
+    /// ⚠️ DEPRECATED: This file represents the old Tetris concept and should NOT be used.
+    /// The game has been redesigned as an octagon merge game (M2 Block style).
+    /// See the Jacameno namespace (proper case) for the current implementation.
+    /// 
+    /// For the new octagon merge game, use:
+    /// - InputController.cs (Jacameno namespace) - Drag-and-drop controls
+    /// - GridManager.cs (Jacameno namespace) - Column-based gameplay
+    /// - OctagonScoreManager.cs - Scoring system
+    /// 
     /// Main game controller handling game loop, tetromino falling, and locking.
     /// </summary>
+    [System.Obsolete("This Tetris-based system is deprecated. Use the Jacameno namespace (proper case) octagon merge system instead.")]
     public class GameController : MonoBehaviour
     {
         public static GameController Instance { get; private set; }

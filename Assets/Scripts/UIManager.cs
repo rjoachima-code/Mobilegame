@@ -5,8 +5,16 @@ using TMPro;
 namespace JACAMENO
 {
     /// <summary>
+    /// ⚠️ DEPRECATED: This file represents the old Tetris concept and should NOT be used.
+    /// The game has been redesigned as an octagon merge game (M2 Block style).
+    /// See the Jacameno namespace (proper case) for the current implementation.
+    /// 
+    /// For the new octagon merge game, use:
+    /// - OctagonUIManager.cs - New UI system for octagon merge game
+    /// 
     /// Manages in-game UI elements like score, level, and next piece preview.
     /// </summary>
+    [System.Obsolete("This Tetris-based system is deprecated. Use OctagonUIManager.cs instead.")]
     public class UIManager : MonoBehaviour
     {
         public static UIManager Instance { get; private set; }

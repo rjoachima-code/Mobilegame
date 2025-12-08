@@ -3,8 +3,16 @@ using UnityEngine;
 namespace JACAMENO
 {
     /// <summary>
+    /// ⚠️ DEPRECATED: This file represents the old Tetris concept and should NOT be used.
+    /// The game has been redesigned as an octagon merge game (M2 Block style).
+    /// See the Jacameno namespace (proper case) for the current implementation.
+    /// 
+    /// For the new octagon merge game, use:
+    /// - OctagonScoreManager.cs - New comprehensive scoring system
+    /// 
     /// Manages scoring, levels, and score-related events.
     /// </summary>
+    [System.Obsolete("This Tetris-based system is deprecated. Use OctagonScoreManager.cs instead.")]
     public class ScoreManager : MonoBehaviour
     {
         public static ScoreManager Instance { get; private set; }

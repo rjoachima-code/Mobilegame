@@ -3,8 +3,18 @@ using UnityEngine;
 namespace JACAMENO
 {
     /// <summary>
+    /// ⚠️ DEPRECATED: This file represents the old Tetris concept and should NOT be used.
+    /// The game has been redesigned as an octagon merge game (M2 Block style).
+    /// See the Jacameno namespace (proper case) for the current implementation.
+    /// 
+    /// For the new octagon merge game, use:
+    /// - InputController.cs (Jacameno namespace) - Drag-and-drop spawning
+    /// - ShapeController.cs (Jacameno namespace) - Shape behavior
+    /// - ShapeData.cs (Jacameno namespace) - Shape definitions
+    /// 
     /// Spawns random tetromino shapes at the top of the grid.
     /// </summary>
+    [System.Obsolete("This Tetris-based system is deprecated. Use the Jacameno namespace (proper case) octagon merge system instead.")]
     public class Spawner : MonoBehaviour
     {
         public static Spawner Instance { get; private set; }

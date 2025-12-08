@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Battle Merge - Neon Firewall Defense</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #0a0a1a 0%, #1a0a2e 100%);
+            color: white;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        #gameContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        #gameCanvas {
+            border: 3px solid #00ffff;
+            box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+            border-radius: 10px;
+            max-width: 100%;
+            image-rendering: pixelated;
+            cursor: pointer;
+        }
+        
+        .ui-panel {
+            background: rgba(10, 10, 30, 0.9);
+            border: 2px solid #ff00ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            box-shadow: 0 0 15px #ff00ff;
+            max-width: 720px;
+            width: 100%;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .stat-item {
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        .stat-item.score { color: #00ffff; }
+        .stat-item.coins { color: #ffff00; }
+        .stat-item.current { color: #ff00ff; }
+        
+        .items {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+        }
+        
+        .item-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            text-shadow: 0 0 5px currentColor;
+        }
+        
+        .item-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px currentColor;
+        }
+        
+        .item-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .item-btn.swap { border-color: #00ffff; }
+        .item-btn.hammer { border-color: #ff6600; }
+        .item-btn.joker { border-color: #ff00ff; }
+        .item-btn.nuke { border-color: #ff0000; }
+        
+        #gameOver {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 30, 0.95);
+            border: 3px solid #ff0000;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 0 30px #ff0000;
+            text-align: center;
+            z-index: 1000;
+        }
+        
+        #gameOver h2 {
+            color: #ff0000;
+            font-size: 48px;
+            text-shadow: 0 0 20px #ff0000;
+            margin-bottom: 20px;
+        }
+        
+        #gameOver button {
+            padding: 15px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00ffff, #ff00ff);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.3s;
+        }
+        
+        #gameOver button:hover {
+            transform: scale(1.1);
+        }
+        
+        .instructions {
+            margin: 10px 0;
+            font-size: 14px;
+            color: #aaaaff;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .stats {
+                font-size: 14px;
+            }
+            .item-btn {
+                font-size: 11px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div class="ui-panel">
+            <div class="stats">
+                <div class="stat-item score">Score: <span id="score">0</span></div>
+                <div class="stat-item coins">Coins: <span id="coins">0</span></div>
+                <div class="stat-item current">Current: <span id="current">2</span></div>
+                <div class="stat-item">Next: <span id="next">2</span></div>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas" width="720" height="1080"></canvas>
+        
+        <div class="ui-panel">
+            <div class="instructions">
+                🎮 Tap columns to drop blocks • Merge identical values • Defend against viruses!
+            </div>
+            <div class="items">
+                <button class="item-btn swap" id="swapBtn" onclick="game.useSwap()">
+                    🔄 Swap<br><small>50c</small>
+                </button>
+                <button class="item-btn hammer" id="hammerBtn" onclick="game.useSledgehammer()">
+                    🔨 Hammer<br><small>100c</small>
+                </button>
+                <button class="item-btn joker" id="jokerBtn" onclick="game.useJoker()">
+                    🃏 Joker<br><small>250c</small>
+                </button>
+                <button class="item-btn nuke" id="nukeBtn" onclick="game.useNuke()">
+                    💣 Nuke<br><small>500c</small>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="gameOver">
+        <h2>GAME OVER</h2>
+        <p id="finalScore" style="font-size: 24px; margin: 20px 0;"></p>
+        <p id="gameOverReason" style="font-size: 18px; color: #ffaaaa;"></p>
+        <button onclick="game.restart()">Restart Game</button>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>

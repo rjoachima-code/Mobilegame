@@ -67,3 +67,14 @@ crashlytics-build.properties
 ignore.conf
 *.private.0
 *.private
+
+# Android build files
+local.properties
+.cxx/
+.gradle/
+.idea/
+*.iml
+
+# Debug/log files
+logcat*.txt
+*.log

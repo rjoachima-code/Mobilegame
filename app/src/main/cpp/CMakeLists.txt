@@ -27,7 +27,6 @@ add_library(myapplication SHARED
         MergeLogic.h
         Assets.cpp
         Assets.h
-        Utils.h
         Spawner.cpp
         Spawner.h
         Rules.cpp

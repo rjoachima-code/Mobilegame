@@ -2,15 +2,20 @@
 
 This is the browser-based version of JACAMENO that can be played directly in any modern web browser.
 
-## 🆕 What's New in v0.9.0
+## 🆕 What's New in Latest Version
 
+- 🎨 **Geometric Sprite System**: Beautiful geometric shapes (triangles, squares, pentagons, hexagons, circles) with unique visual effects per block value
+- 🌟 **Cyberpunk Aesthetic**: Dark minimalist theme with neon glow effects and bloom lighting
+- 🎯 **Visual Block Differentiation**: Each block value (2, 4, 8, 16, 32+) has a distinct shape and color
 - ⭐ **High Score Persistence**: Your high score now saves automatically
 - 🔊 **Sound Effects**: Audio feedback for moves, rotations, merges, and more
 - 🎉 **New High Score Celebration**: Special animation when you beat your record
-- 📊 **Enhanced UI**: High score displayed on menu screen
+- 📊 **Enhanced UI**: High score displayed on menu screen with neon styling
 
 ## Features
 
+- ✅ **Geometric Sprite System**: Custom-rendered geometric shapes with cyberpunk aesthetic
+- ✅ **Visual Effects**: Neon glow, bloom effects, and distinctive styling per block type
 - ✅ Full Tetris gameplay with tetromino pieces (I, O, T, L, J, S, Z)
 - ✅ M2 Block merge mechanics (blocks with same value merge and double)
 - ✅ Score tracking and leveling system
@@ -132,19 +137,29 @@ Works on all modern browsers:
 
 ```
 web/
-├── index.html      # Main HTML structure
-├── styles.css      # Styling and responsive design
-├── game.js         # Game logic and mechanics
-└── README.md       # This file
+├── index.html                # Main HTML structure
+├── styles.css                # Styling and responsive design (cyberpunk theme)
+├── game.js                   # Game logic and mechanics
+├── sprites.js                # Geometric sprite renderer system
+├── SPRITES_DOCUMENTATION.md  # Detailed sprite system documentation
+└── README.md                 # This file
 ```
 
 ### Customization
 
-**Change Colors:**
-Edit the color values in `game.js` under `initTetrominoes()`:
+**Change Geometric Shape Colors:**
+Edit the color values in `sprites.js` under `shapeConfigs`:
 ```javascript
-'I': { shape: [[1,1,1,1]], color: '#00f0f0', value: 2 }
+2: { 
+    shape: 'triangle', 
+    color: '#00d4ff',  // Neon blue
+    glowColor: 'rgba(0, 212, 255, 0.8)',
+    effect: 'glass'
+}
 ```
+
+**Adjust Bloom Effects:**
+Modify bloom intensity in `sprites.js` `drawBloomEffect()` method
 
 **Adjust Difficulty:**
 Modify starting drop interval in `game.js`:
@@ -183,7 +198,8 @@ The web version is a lightweight implementation focused on core gameplay:
 - ⏳ Power-ups (Bomb, Freeze, etc.)
 - ⏳ Background music
 - ⏳ Settings menu (sound toggle, etc.)
-- ⏳ Advanced visual effects
+- ⏳ Particle effects on merges
+- ⏳ Shape morph animations
 - ⏳ Achievements
 - ⏳ Online leaderboard
 

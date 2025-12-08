@@ -3,11 +3,11 @@
 
 cmake_minimum_required(VERSION 3.22.1)
 
-project("myapplication")
+project("jacameno")
 
 # Creates your game shared library. The name must be the same as the
 # one used for loading in your Kotlin/Java or AndroidManifest.txt files.
-add_library(myapplication SHARED
+add_library(jacameno SHARED
         main.cpp
         AndroidOut.cpp
         Renderer.cpp
@@ -49,12 +49,12 @@ find_package(game-activity REQUIRED CONFIG)
 set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -u Java_com_google_androidgamesdk_GameActivity_initializeNativeCode")
 
-target_include_directories(myapplication PRIVATE
+target_include_directories(jacameno PRIVATE
     ${game-activity_INCLUDE_DIRS}
 )
 
 # Configure libraries CMake uses to link your target library.
-target_link_libraries(myapplication
+target_link_libraries(jacameno
         # The game activity
         game-activity::game-activity_static
 

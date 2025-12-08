@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JACAMENO - Mobile Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="menu-screen" class="screen active">
+            <h1 class="title">JACAMENO</h1>
+            <p class="subtitle">Tetris meets M2 Block Merge</p>
+            <div class="high-score-display">
+                <span class="label">High Score:</span>
+                <span id="high-score" class="value">0</span>
+            </div>
+            <button id="start-btn" class="btn btn-primary">Start Game</button>
+            <div class="controls-info">
+                <h3>Controls</h3>
+                <p><strong>Arrow Keys / WASD:</strong> Move and Rotate</p>
+                <p><strong>Space:</strong> Hard Drop</p>
+                <p><strong>P / ESC:</strong> Pause</p>
+                <p><strong>Touch:</strong> Swipe to move, Tap to rotate</p>
+            </div>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div id="game-ui">
+                <div id="score-panel">
+                    <div class="stat">
+                        <span class="label">Score</span>
+                        <span id="score" class="value">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Level</span>
+                        <span id="level" class="value">1</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Lines</span>
+                        <span id="lines" class="value">0</span>
+                    </div>
+                </div>
+                <button id="pause-btn" class="btn btn-small">Pause</button>
+            </div>
+            
+            <div id="game-area">
+                <canvas id="game-canvas" width="400" height="800"></canvas>
+                <div id="next-piece-panel">
+                    <h3>Next</h3>
+                    <canvas id="next-canvas" width="120" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="pause-screen" class="screen overlay">
+            <div class="modal">
+                <h2>Paused</h2>
+                <button id="resume-btn" class="btn btn-primary">Resume</button>
+                <button id="restart-btn" class="btn btn-secondary">Restart</button>
+                <button id="menu-btn" class="btn btn-secondary">Main Menu</button>
+            </div>
+        </div>
+
+        <div id="gameover-screen" class="screen overlay">
+            <div class="modal">
+                <h2>Game Over</h2>
+                <p class="final-score">Score: <span id="final-score">0</span></p>
+                <p id="new-high-score" class="new-high-score" style="display: none;">🎉 New High Score! 🎉</p>
+                <button id="play-again-btn" class="btn btn-primary">Play Again</button>
+                <button id="menu-btn-2" class="btn btn-secondary">Main Menu</button>
+            </div>
+        </div>
+
+        <div id="error-screen" class="screen overlay" style="display: none;">
+            <div class="modal">
+                <h2>⚠️ Error</h2>
+                <p id="error-message" class="error-message">An error occurred</p>
+                <button id="error-close-btn" class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

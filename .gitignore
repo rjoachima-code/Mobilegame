@@ -68,13 +68,11 @@ ignore.conf
 *.private.0
 *.private
 
-# Android build files
-local.properties
-.cxx/
+# Android/Gradle
 .gradle/
 .idea/
+build/
+local.properties
 *.iml
-
-# Debug/log files
+.cxx/
 logcat*.txt
-*.log

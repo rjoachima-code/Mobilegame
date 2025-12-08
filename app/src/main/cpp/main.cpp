@@ -10,6 +10,7 @@
 #include "GameLoop.h"
 #include "Assets.h"
 #include "AudioManager.h"
+#include "Tests.h"
 
 extern "C" {
 
@@ -143,6 +144,13 @@ void android_main(struct android_app *pApp) {
 extern "C" JNIEXPORT void JNICALL
 Java_com_google_androidgamesdk_GameActivity_initializeNativeCode(JNIEnv* env, jclass clazz, jobject activity) {
     aout << "Java_com_google_androidgamesdk_GameActivity_initializeNativeCode: native library loaded" << std::endl;
+
+    // Run unit tests early to validate core gameplay logic
+    if (!Tests::runAllTests()) {
+        aout << "initializeNativeCode: Some tests failed" << std::endl;
+    } else {
+        aout << "initializeNativeCode: All tests passed" << std::endl;
+    }
 
     // Spawn a background thread to run android_main once g_pApp is available.
     if (!g_native_thread_started.exchange(true)) {

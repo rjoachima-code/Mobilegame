@@ -39,16 +39,19 @@ void InputManager::poll(android_app* app) {
                 auto pointer = motionEvent.pointers[p];
                 float x = GameActivityPointerAxes_getX(&pointer);
                 float y = GameActivityPointerAxes_getY(&pointer);
-                touches_.push_back({pointer.id, x, y, action});
+                // normalize to 0..1
+                float nx = x / width;
+                float ny = y / height;
+                touches_.push_back({pointer.id, nx, ny, action});
 
                 // update pointer map
                 auto it = g_pointerMap.find(pointer.id);
                 if (it != g_pointerMap.end()) {
-                    it->second.x = x; it->second.y = y;
+                    it->second.x = nx; it->second.y = ny;
                 }
 
                 // interpret move for soft drop if pointer is in bottom area
-                if (y > height * 0.8f) state_.softDrop = true;
+                if (ny > 0.8f) state_.softDrop = true;
             }
         } else {
             auto pointerIndex = (motionEvent.action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >>
@@ -57,14 +60,16 @@ void InputManager::poll(android_app* app) {
                 auto pointer = motionEvent.pointers[pointerIndex];
                 float x = GameActivityPointerAxes_getX(&pointer);
                 float y = GameActivityPointerAxes_getY(&pointer);
-                touches_.push_back({pointer.id, x, y, action});
+                float nx = x / width;
+                float ny = y / height;
+                touches_.push_back({pointer.id, nx, ny, action});
 
                 if (action == AMOTION_EVENT_ACTION_DOWN || action == AMOTION_EVENT_ACTION_POINTER_DOWN) {
                     // add to pointer map
-                    g_pointerMap[pointer.id] = {x, y, clock::now(), true};
-                    if (x < width * 0.4f) state_.moveLeft = true;
-                    else if (x > width * 0.6f) state_.moveRight = true;
-                    else if (y < height * 0.3f) state_.rotate = true;
+                    g_pointerMap[pointer.id] = {nx, ny, clock::now(), true};
+                    if (nx < 0.4f) state_.moveLeft = true;
+                    else if (nx > 0.6f) state_.moveRight = true;
+                    else if (ny < 0.3f) state_.rotate = true;
                 }
 
                 if (action == AMOTION_EVENT_ACTION_UP || action == AMOTION_EVENT_ACTION_POINTER_UP) {
@@ -74,11 +79,11 @@ void InputManager::poll(android_app* app) {
                         auto down = it->second.downTime;
                         auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - down).count();
                         // if was held briefly in bottom zone -> hard drop
-                        if (y > height * 0.85f && dur < 500) state_.hardDrop = true;
+                        if (ny > 0.85f && dur < 500) state_.hardDrop = true;
                         it->second.isDown = false;
                         g_pointerMap.erase(it);
                     } else {
-                        if (y > height * 0.85f) state_.hardDrop = true;
+                        if (ny > 0.85f) state_.hardDrop = true;
                     }
                 }
             }
@@ -93,10 +98,10 @@ void InputManager::poll(android_app* app) {
         auto &pi = kv.second;
         if (!pi.isDown) continue;
         // which side is pointer on?
-        if (pi.x < width * 0.4f) {
+        if (pi.x < 0.4f) {
             auto heldMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - pi.downTime).count();
             if (heldMs >= dasMs) state_.moveLeftHeld = true;
-        } else if (pi.x > width * 0.6f) {
+        } else if (pi.x > 0.6f) {
             auto heldMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - pi.downTime).count();
             if (heldMs >= dasMs) state_.moveRightHeld = true;
         }

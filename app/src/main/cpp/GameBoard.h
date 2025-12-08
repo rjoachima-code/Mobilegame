@@ -32,6 +32,9 @@ public:
     uint8_t cell(int x, int y) const;
     void setCell(int x, int y, uint8_t v);
 
+    // Return what should be rendered at this position (includes active falling piece overlay)
+    uint8_t visibleCell(int x, int y) const;
+
     // debug: print board to log
     void debugPrint() const;
 

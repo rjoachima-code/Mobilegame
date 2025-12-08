@@ -85,6 +85,7 @@ private:
     Model hudModel_ = Model({}, {}, nullptr);
     std::shared_ptr<TextureAsset> hudTexture_;
     std::shared_ptr<TextureAsset> fontAtlasTexture_;
+    std::unique_ptr<Shader> sdfShader_; // SDF shader for crisp numeric text
 
     // cached tile texture and template model for reuse
     std::shared_ptr<TextureAsset> spTileTexture_;

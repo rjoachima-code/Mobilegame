@@ -1,0 +1,38 @@
+{
+  "buildFiles": [
+    "C:\\Users\\Ve7gasKnights\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\Ve7gasKnights\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "C:\\Users\\Ve7gasKnights\\AndroidStudioProjects\\MyApplication\\app\\.cxx\\Debug\\3g5b3n2x\\x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\Ve7gasKnights\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "C:\\Users\\Ve7gasKnights\\AndroidStudioProjects\\MyApplication\\app\\.cxx\\Debug\\3g5b3n2x\\x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "myapplication::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "x86_64",
+      "artifactName": "myapplication",
+      "output": "C:\\Users\\Ve7gasKnights\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\cxx\\Debug\\3g5b3n2x\\obj\\x86_64\\libmyapplication.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "C:\\Users\\Ve7gasKnights\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang.exe",
+      "cppCompilerExecutable": "C:\\Users\\Ve7gasKnights\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

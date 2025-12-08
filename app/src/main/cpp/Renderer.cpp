@@ -100,6 +100,34 @@ void main() {
 }
 )pf";
 
+// SDF fragment shader for crisp text (expects single-channel alpha in atlas packed into RGBA)
+static const char *sdfVertex = R"sv(#version 300 es
+in vec3 inPosition;
+in vec2 inUV;
+out vec2 vUV;
+uniform mat4 uProjection;
+void main() {
+    vUV = inUV;
+    gl_Position = uProjection * vec4(inPosition, 1.0);
+}
+)sv";
+
+static const char *sdfFragment = R"sf(#version 300 es
+precision mediump float;
+in vec2 vUV;
+uniform sampler2D uTexture;
+uniform vec4 uColor; // text color
+out vec4 outColor;
+void main() {
+    vec4 t = texture(uTexture, vUV);
+    // assume the glyph alpha lives in t.a (or t.r); use alpha as SDF distance
+    float sd = t.a;
+    float smoothing = 0.25; // tuned for atlas; might be adjusted by glyph size
+    float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, sd);
+    outColor = vec4(uColor.rgb, uColor.a * alpha);
+}
+)sf";
+
 /*!
  * Half the height of the projection matrix. This gives you a renderable area of height 4 ranging
  * from -2 to 2
@@ -465,6 +493,12 @@ void Renderer::initRenderer() {
             }
         }
     }
+
+    // create SDF shader for text rendering (fallback to basic shader if compile fails)
+    sdfShader_ = std::unique_ptr<Shader>(Shader::loadShader(sdfVertex, sdfFragment, "inPosition", "inUV", "uProjection"));
+    if (!sdfShader_) {
+        aout << "initRenderer: sdfShader_ failed to load, text will use basic shader" << std::endl;
+    }
 }
 
 void Renderer::createModels() {
@@ -522,7 +556,7 @@ void Renderer::renderBoard(const GameBoard &board) {
     models_.clear();
     for (int y = 0; y < BOARD_H; ++y) {
         for (int x = 0; x < BOARD_W; ++x) {
-            uint8_t c = board.cell(x,y);
+            uint8_t c = board.visibleCell(x,y); // use visibleCell to include active piece overlay
             if (c == 0) continue;
             // create a small quad model at board coordinates by copying vertices and shifting
             std::vector<Vertex> verts = {
@@ -531,6 +565,7 @@ void Renderer::renderBoard(const GameBoard &board) {
                     Vertex(Vector3{(float)x - 1, (float)(-y) + 1, 0}, Vector2{1, 1}),
                     Vertex(Vector3{(float)x, (float)(-y) + 1, 0}, Vector2{0, 1})
             };
+            // For now we reuse the same tile texture; in future use number-based atlas
             models_.emplace_back(verts, std::vector<Index>{0,1,2,0,2,3}, spTileTexture_);
         }
     }
@@ -626,6 +661,18 @@ void Renderer::handleInput() {
 
 void Renderer::renderText(const std::string &text, float x, float y, float glyphW, float glyphH) {
     if (!fontAtlasTexture_) return;
+    Shader *useShader = nullptr;
+    if (sdfShader_) {
+        useShader = sdfShader_.get();
+    } else {
+        useShader = shader_.get();
+    }
+    useShader->activate();
+    // set color uniform if SDF shader
+    if (sdfShader_) {
+        sdfShader_->setUniform4f("uColor", 1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
     // assume atlas contains digits 0-9 in a single row
     for (size_t i = 0; i < text.size(); ++i) {
         char c = text[i];
@@ -645,8 +692,10 @@ void Renderer::renderText(const std::string &text, float x, float y, float glyph
         };
         std::vector<Index> inds = {0,1,2,0,2,3};
         Model m(verts, inds, fontAtlasTexture_);
-        shader_->drawModel(m);
+        useShader->drawModel(m);
     }
+
+    useShader->deactivate();
 }
 
 void Renderer::renderHUD(int score) {

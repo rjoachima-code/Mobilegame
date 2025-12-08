@@ -1,330 +1,255 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace JACAMENO
+namespace Jacameno
 {
     /// <summary>
-    /// Manages the game grid (10x20), cell states, and collision detection.
+    /// Manages the 5-column grid, kinematic placement, and merge checks.
     /// </summary>
     public class GridManager : MonoBehaviour
     {
-        public static GridManager Instance { get; private set; }
+        [SerializeField] private int columnCount = 5;
+        [SerializeField] private float columnWidth = 1.2f;
+        [SerializeField] private float baseY = -3.5f;
+        [SerializeField] private float rowHeight = 1.1f;
+        [SerializeField] private Transform shapesParent = null;
+        [SerializeField] private GameObject shapePrefab = null; // Prefab with ShapeController
+        [SerializeField] private MergeMechanic mergeMechanic = null;
 
-        [Header("Grid Settings")]
-        public int GridWidth = 10;
-        public int GridHeight = 20;
-        public float CellSize = 1f;
-        public Transform GridParent;
+        // Array of lists, each list is bottom->top order (0 = bottom)
+        private List<ShapeController>[] columns;
 
-        // Grid data structure: stores references to blocks at each position
-        private Block[,] grid;
-
-        // Visual representation of the grid
-        private GameObject[,] gridCells;
-
-        [Header("Visual Settings")]
-        public GameObject GridCellPrefab;
-        public Color GridLineColor = new Color(0.2f, 0.8f, 1f, 0.3f);
+        public int ColumnCount => columnCount;
 
         private void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else
-            {
-                Destroy(gameObject);
-                return;
-            }
+            columns = new List<ShapeController>[columnCount];
+            for (int i = 0; i < columnCount; i++)
+                columns[i] = new List<ShapeController>();
 
-            InitializeGrid();
+            if (shapesParent == null)
+                shapesParent = this.transform;
         }
 
-        private void InitializeGrid()
+        /// <summary>
+        /// Calculate world X for a given column index.
+        /// </summary>
+        public float GetColumnX(int colIndex)
         {
-            grid = new Block[GridWidth, GridHeight];
-            gridCells = new GameObject[GridWidth, GridHeight];
-
-            if (GridParent == null)
-            {
-                GridParent = transform;
-            }
-
-            CreateGridVisual();
+            float center = (columnCount - 1) * 0.5f;
+            return this.transform.position.x + (colIndex - center) * columnWidth;
         }
 
-        private void CreateGridVisual()
+        /// <summary>
+        /// Returns the target Y for the next shape in the column (top position).
+        /// </summary>
+        public float GetTargetY(int colIndex)
         {
-            for (int x = 0; x < GridWidth; x++)
+            int count = Mathf.Clamp(columns[colIndex].Count, 0, int.MaxValue);
+            return baseY + (count * rowHeight);
+        }
+
+        /// <summary>
+        /// Drops shape into a column. The shape's GameObject is parented to shapesParent.
+        /// </summary>
+        public void DropShape(int colIndex, ShapeController shape)
+        {
+            if (colIndex < 0 || colIndex >= columnCount) colIndex = Mathf.Clamp(colIndex, 0, columnCount - 1);
+            // Add to logical column
+            columns[colIndex].Add(shape);
+            shape.transform.SetParent(shapesParent, true);
+
+            Vector3 target = new Vector3(GetColumnX(colIndex), GetTargetY(colIndex), 0f);
+            shape.MoveToPosition(target);
+
+            // After it lands, schedule merge check. We'll run a coroutine to wait until Landed
+            StartCoroutine(WaitAndCheckMerge(colIndex, shape));
+        }
+
+        private System.Collections.IEnumerator WaitAndCheckMerge(int colIndex, ShapeController shape)
+        {
+            // Wait until shape state is Landed
+            while (shape.CurrentState != ShapeController.State.Landed)
+                yield return null;
+
+            // Ensure shape is top of column
+            if (columns[colIndex].Count >= 2)
             {
-                for (int y = 0; y < GridHeight; y++)
+                CheckMerge(colIndex);
+            }
+        }
+
+        /// <summary>
+        /// Checks the top two shapes in the given column. If they match, remove both and spawn evolution.
+        /// Now supports multi-shape combos using MergeMechanic.
+        /// </summary>
+        public void CheckMerge(int colIndex)
+        {
+            var list = columns[colIndex];
+            if (list.Count < 2) return;
+
+            var top = list[list.Count - 1];
+            var second = list[list.Count - 2];
+
+            if (top.Data == null || second.Data == null) return;
+
+            // Match based on same ShapeData reference
+            if (top.Data == second.Data)
+            {
+                // Collect merge candidates including magnet neighbors
+                List<ShapeController> toMerge = CollectMergeCandidates(colIndex, top.Data);
+
+                // Remove them from their columns
+                foreach (var s in toMerge)
                 {
-                    Vector3 position = GridToWorld(x, y);
-                    
-                    // Create visual cell if prefab exists
-                    if (GridCellPrefab != null)
+                    RemoveShapeFromColumns(s);
+                }
+
+                // Calculate resulting shape (single evolution step)
+                ShapeData result = top.Data.NextEvolution;
+
+                if (mergeMechanic != null)
+                {
+                    // Use MergeMechanic coroutine to animate merge and spawn result
+                    StartCoroutine(mergeMechanic.ProcessMerge(toMerge, result, shapePrefab, shapesParent, (spawned) => {
+                        if (spawned != null)
+                        {
+                            // Add spawned shape logically to this column and move to correct Y
+                            columns[colIndex].Add(spawned);
+                            spawned.MoveToPosition(new Vector3(GetColumnX(colIndex), GetTargetY(colIndex), 0f));
+                            spawned.PlaySquishAnimation();
+
+                            // After spawning, run another check for chain merges
+                            StartCoroutine(DelayedMergeCheck(colIndex));
+                        }
+                    }));
+                }
+                else
+                {
+                    // Fallback: immediate spawn
+                    Vector3 mergeCenter = Vector3.zero;
+                    foreach (var s in toMerge) mergeCenter += s.transform.position;
+                    mergeCenter /= Mathf.Max(1, toMerge.Count);
+
+                    if (result != null && shapePrefab != null)
                     {
-                        GameObject cell = Instantiate(GridCellPrefab, position, Quaternion.identity, GridParent);
-                        cell.name = $"Cell_{x}_{y}";
-                        gridCells[x, y] = cell;
+                        GameObject go = Instantiate(shapePrefab, mergeCenter, Quaternion.identity, shapesParent);
+                        var sc = go.GetComponent<ShapeController>();
+                        sc.Initialize(result);
+                        columns[colIndex].Add(sc);
+                        sc.MoveToPosition(new Vector3(GetColumnX(colIndex), GetTargetY(colIndex), 0f));
+                        sc.PlaySquishAnimation();
+
+                        MagnetCheck(colIndex, result);
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Converts grid coordinates to world position.
+        /// Collects merge candidates starting from the top two in column, then expanding to adjacent columns for matching shapes (magnet effect).
         /// </summary>
-        public Vector3 GridToWorld(int x, int y)
+        private List<ShapeController> CollectMergeCandidates(int startCol, ShapeData matchData)
         {
-            float offsetX = -(GridWidth * CellSize) / 2f + CellSize / 2f;
-            float offsetY = -(GridHeight * CellSize) / 2f + CellSize / 2f;
-            return new Vector3(x * CellSize + offsetX, y * CellSize + offsetY, 0);
-        }
+            List<ShapeController> found = new List<ShapeController>();
 
-        /// <summary>
-        /// Converts world position to grid coordinates.
-        /// </summary>
-        public Vector2Int WorldToGrid(Vector3 worldPos)
-        {
-            float offsetX = -(GridWidth * CellSize) / 2f + CellSize / 2f;
-            float offsetY = -(GridHeight * CellSize) / 2f + CellSize / 2f;
-            
-            int x = Mathf.RoundToInt((worldPos.x - offsetX) / CellSize);
-            int y = Mathf.RoundToInt((worldPos.y - offsetY) / CellSize);
-            
-            return new Vector2Int(x, y);
-        }
-
-        /// <summary>
-        /// Checks if a position is within the grid bounds.
-        /// </summary>
-        public bool IsInsideGrid(int x, int y)
-        {
-            return x >= 0 && x < GridWidth && y >= 0 && y < GridHeight;
-        }
-
-        /// <summary>
-        /// Checks if a position is valid (inside grid and empty).
-        /// </summary>
-        public bool IsValidPosition(int x, int y)
-        {
-            return IsInsideGrid(x, y) && grid[x, y] == null;
-        }
-
-        /// <summary>
-        /// Places a block at the specified grid position.
-        /// </summary>
-        public bool PlaceBlock(Block block, int x, int y)
-        {
-            if (!IsValidPosition(x, y))
-                return false;
-
-            grid[x, y] = block;
-            block.GridPosition = new Vector2Int(x, y);
-            block.transform.position = GridToWorld(x, y);
-            return true;
-        }
-
-        /// <summary>
-        /// Removes a block from the specified grid position.
-        /// </summary>
-        public void RemoveBlock(int x, int y)
-        {
-            if (IsInsideGrid(x, y))
+            // First, add all consecutive matching shapes from the top of the start column
+            var colList = columns[startCol];
+            for (int i = colList.Count - 1; i >= 0; i--)
             {
-                grid[x, y] = null;
+                var s = colList[i];
+                if (s != null && s.Data == matchData)
+                    found.Add(s);
+                else
+                    break; // stop when a different shape is encountered
             }
-        }
 
-        /// <summary>
-        /// Gets the block at the specified grid position.
-        /// </summary>
-        public Block GetBlock(int x, int y)
-        {
-            if (IsInsideGrid(x, y))
-                return grid[x, y];
-            return null;
-        }
-
-        /// <summary>
-        /// Checks if a tetromino can move to the specified position.
-        /// </summary>
-        public bool CanTetrominoMove(Tetromino tetromino, Vector2Int targetPos)
-        {
-            foreach (Block block in tetromino.Blocks)
+            // Check neighbors for their top matches and recursively add if matching
+            int[] neighbors = new int[] { startCol - 1, startCol + 1 };
+            foreach (int n in neighbors)
             {
-                Vector2Int newPos = targetPos + block.LocalPosition;
-                
-                if (!IsInsideGrid(newPos.x, newPos.y))
-                    return false;
-                
-                if (grid[newPos.x, newPos.y] != null && !tetromino.Blocks.Contains(grid[newPos.x, newPos.y]))
-                    return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Checks if a tetromino can rotate.
-        /// </summary>
-        public bool CanTetrominoRotate(Tetromino tetromino, Vector2Int[] newLocalPositions)
-        {
-            for (int i = 0; i < tetromino.Blocks.Count; i++)
-            {
-                Vector2Int newPos = tetromino.GridPosition + newLocalPositions[i];
-                
-                if (!IsInsideGrid(newPos.x, newPos.y))
-                    return false;
-                
-                Block existingBlock = grid[newPos.x, newPos.y];
-                if (existingBlock != null && !tetromino.Blocks.Contains(existingBlock))
-                    return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Locks a tetromino in place on the grid.
-        /// </summary>
-        public void LockTetromino(Tetromino tetromino)
-        {
-            foreach (Block block in tetromino.Blocks)
-            {
-                Vector2Int gridPos = tetromino.GridPosition + block.LocalPosition;
-                if (IsInsideGrid(gridPos.x, gridPos.y))
+                if (n < 0 || n >= columnCount) continue;
+                var nList = columns[n];
+                if (nList.Count == 0) continue;
+                var top = nList[nList.Count - 1];
+                if (top != null && top.Data == matchData)
                 {
-                    grid[gridPos.x, gridPos.y] = block;
-                    block.GridPosition = gridPos;
-                    block.transform.SetParent(GridParent);
-                    block.IsLocked = true;
-                }
-            }
-        }
+                    // Add neighbor top and then also check further magnet chain
+                    found.Add(top);
 
-        /// <summary>
-        /// Checks and clears completed rows, returns number of rows cleared.
-        /// </summary>
-        public int ClearCompletedRows()
-        {
-            int rowsCleared = 0;
-
-            for (int y = GridHeight - 1; y >= 0; y--)
-            {
-                if (IsRowComplete(y))
-                {
-                    ClearRow(y);
-                    MoveRowsDown(y);
-                    rowsCleared++;
-                    y++; // Check same row again after moving down
-                }
-            }
-
-            return rowsCleared;
-        }
-
-        private bool IsRowComplete(int y)
-        {
-            for (int x = 0; x < GridWidth; x++)
-            {
-                if (grid[x, y] == null)
-                    return false;
-            }
-            return true;
-        }
-
-        private void ClearRow(int y)
-        {
-            for (int x = 0; x < GridWidth; x++)
-            {
-                if (grid[x, y] != null)
-                {
-                    Destroy(grid[x, y].gameObject);
-                    grid[x, y] = null;
-                }
-            }
-        }
-
-        private void MoveRowsDown(int startRow)
-        {
-            for (int y = startRow + 1; y < GridHeight; y++)
-            {
-                for (int x = 0; x < GridWidth; x++)
-                {
-                    if (grid[x, y] != null)
+                    // If neighbor now has additional matching items below top, also collect them
+                    for (int j = nList.Count - 2; j >= 0; j--)
                     {
-                        Block block = grid[x, y];
-                        grid[x, y - 1] = block;
-                        grid[x, y] = null;
-                        block.GridPosition = new Vector2Int(x, y - 1);
-                        block.transform.position = GridToWorld(x, y - 1);
+                        var s = nList[j];
+                        if (s != null && s.Data == matchData)
+                            found.Add(s);
+                        else
+                            break;
                     }
                 }
             }
+
+            return found;
         }
 
         /// <summary>
-        /// Checks if the game is over (blocks at top row).
+        /// Removes a shape from whichever column list it belongs to.
         /// </summary>
-        public bool IsGameOver()
+        private void RemoveShapeFromColumns(ShapeController s)
         {
-            for (int x = 0; x < GridWidth; x++)
+            for (int c = 0; c < columns.Length; c++)
             {
-                if (grid[x, GridHeight - 1] != null)
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Clears the entire grid.
-        /// </summary>
-        public void ClearGrid()
-        {
-            for (int x = 0; x < GridWidth; x++)
-            {
-                for (int y = 0; y < GridHeight; y++)
+                if (columns[c].Contains(s))
                 {
-                    if (grid[x, y] != null)
-                    {
-                        Destroy(grid[x, y].gameObject);
-                        grid[x, y] = null;
-                    }
+                    columns[c].Remove(s);
+                    return;
                 }
             }
         }
 
         /// <summary>
-        /// Gets all blocks in a specific row.
+        /// If adjacent columns have the same shape as "mergeShape", those shapes are drawn into this column and animated.
+        /// Retained for backward compatibility but main merge now uses CollectMergeCandidates.
         /// </summary>
-        public Block[] GetRow(int y)
+        private void MagnetCheck(int colIndex, ShapeData mergeShape)
         {
-            Block[] row = new Block[GridWidth];
-            for (int x = 0; x < GridWidth; x++)
+            int[] neighbors = new int[] { colIndex - 1, colIndex + 1 };
+            List<ShapeController> attracted = new List<ShapeController>();
+
+            foreach (int n in neighbors)
             {
-                row[x] = grid[x, y];
+                if (n < 0 || n >= columnCount) continue;
+                var list = columns[n];
+                if (list.Count == 0) continue;
+                var top = list[list.Count - 1];
+                if (top.Data == mergeShape)
+                {
+                    // Remove from neighbor and add to current column
+                    list.RemoveAt(list.Count - 1);
+                    attracted.Add(top);
+                }
             }
-            return row;
+
+            if (attracted.Count == 0) return;
+
+            // Move attracted shapes to the merge column and animate
+            foreach (var s in attracted)
+            {
+                s.transform.SetParent(shapesParent, true);
+                columns[colIndex].Add(s);
+                Vector3 target = new Vector3(GetColumnX(colIndex), GetTargetY(colIndex), 0f);
+                s.MoveToPosition(target);
+            }
+
+            // After movement, check merges recursively
+            StartCoroutine(DelayedMergeCheck(colIndex));
         }
 
-        private void OnDrawGizmos()
+        private System.Collections.IEnumerator DelayedMergeCheck(int colIndex)
         {
-            // Draw grid outline in editor
-            Gizmos.color = GridLineColor;
-            
-            for (int x = 0; x <= GridWidth; x++)
-            {
-                Vector3 start = GridToWorld(x, 0) - new Vector3(CellSize / 2f, CellSize / 2f, 0);
-                Vector3 end = GridToWorld(x, GridHeight - 1) + new Vector3(-CellSize / 2f, CellSize / 2f, 0);
-                Gizmos.DrawLine(start, end);
-            }
-            
-            for (int y = 0; y <= GridHeight; y++)
-            {
-                Vector3 start = GridToWorld(0, y) - new Vector3(CellSize / 2f, CellSize / 2f, 0);
-                Vector3 end = GridToWorld(GridWidth - 1, y) + new Vector3(CellSize / 2f, -CellSize / 2f, 0);
-                Gizmos.DrawLine(start, end);
-            }
+            // Wait a short time for moves to approximate finish
+            yield return new WaitForSeconds(0.24f);
+            CheckMerge(colIndex);
         }
     }
 }

@@ -63,6 +63,9 @@ public:
      */
     void setProjectionMatrix(float *projectionMatrix) const;
 
+    // set vec4 uniform by name (helper)
+    void setUniform4f(const std::string &name, float x, float y, float z, float w) const;
+
 private:
     /*!
      * Helper function to load a shader of a given type

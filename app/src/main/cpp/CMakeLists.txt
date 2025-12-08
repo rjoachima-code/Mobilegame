@@ -39,6 +39,7 @@ add_library(myapplication SHARED
         EffectManager.cpp
         EffectManager.h
         ScoreManager.cpp
+        Tests.cpp
         GameActivityJNI.cpp
 )
 

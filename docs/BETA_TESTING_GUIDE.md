@@ -15,16 +15,20 @@ Welcome to the JACAMENO beta testing program! Thank you for helping us improve t
 
 ### Web Version (Easiest - Start Here!)
 
+**🌐 Play Online:** [https://rjoachima-code.github.io/Mobilegame/](https://rjoachima-code.github.io/Mobilegame/)
+
+**For Local Testing:**
+
 1. **Open the game**: Navigate to `web/index.html` in your browser
    
-2. **For local testing**:
+2. **Or use a local web server**:
    ```bash
    cd web
    python3 -m http.server 8000
    # Then open: http://localhost:8000
    ```
 
-3. **Mobile testing**: Open the same URL on your mobile device
+3. **Mobile testing**: Open the online link or local URL on your mobile device
 
 ### Android Version
 

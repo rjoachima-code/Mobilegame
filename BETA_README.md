@@ -4,7 +4,9 @@
 
 ## Try It Now! (Web Version)
 
-The easiest way to test JACAMENO is through the web version:
+**Play online at:** [https://rjoachima-code.github.io/Mobilegame/](https://rjoachima-code.github.io/Mobilegame/)
+
+Or test locally:
 
 ```bash
 cd web
@@ -12,7 +14,7 @@ python3 -m http.server 8000
 # Open http://localhost:8000 in your browser
 ```
 
-Or simply open `web/index.html` in any modern browser!
+You can also open `web/index.html` directly in any modern browser!
 
 ## What's New in This Version
 

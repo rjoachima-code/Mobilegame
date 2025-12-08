@@ -152,3 +152,10 @@ void Shader::drawModel(const Model &model) const {
 void Shader::setProjectionMatrix(float *projectionMatrix) const {
     glUniformMatrix4fv(projectionMatrix_, 1, false, projectionMatrix);
 }
+
+void Shader::setUniform4f(const std::string &name, float x, float y, float z, float w) const {
+    GLint loc = glGetUniformLocation(program_, name.c_str());
+    if (loc >= 0) {
+        glUniform4f(loc, x, y, z, w);
+    }
+}

@@ -27,7 +27,6 @@ add_library(jacameno SHARED
         MergeLogic.h
         Assets.cpp
         Assets.h
-        Utils.h
         Spawner.cpp
         Spawner.h
         Rules.cpp
@@ -39,6 +38,7 @@ add_library(jacameno SHARED
         EffectManager.cpp
         EffectManager.h
         ScoreManager.cpp
+        Tests.cpp
         GameActivityJNI.cpp
 )
 

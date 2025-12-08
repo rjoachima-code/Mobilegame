@@ -21,31 +21,41 @@ This repository contains a native Android game written in C++ using Google GameA
 - ⭐ **NEW**: High scores now save automatically!
 - 🔊 **NEW**: Sound effects added!
 
-## Game Overview
+## 🎮 Game Overview
 
-1) Environment (examples — adjust to your machine):
+**JACAMENO** is an octagon-shaped puzzle game inspired by M2 Block, where you merge geometric shapes to create increasingly complex forms!
 
-```powershell
-$env:JAVA_HOME = "C:\Program Files\Java\jdk-17"
-$env:ANDROID_SDK_ROOT = "C:\Users\<you>\AppData\Local\Android\Sdk"
-$env:ANDROID_NDK_HOME = "C:\Users\<you>\AppData\Local\Android\Sdk\ndk\<version>"
-$env:PATH += ";$env:ANDROID_SDK_ROOT\platform-tools"
+### Game Concept
+- **No Tetris mechanics**: No rotation, no falling tetrominoes
+- **M2 Block style**: Drag and drop shapes into columns
+- **Octagon shapes**: Merge triangles → squares → pentagons → hexagons → octagons!
+- **Strategic merging**: Create combo chains and use the magnet effect
+- **Scoring system**: Points based on shape complexity, combos, and level
+
+📖 **[Complete Game Guide](OCTAGON_MERGE_GAME.md)** - Learn strategies and scoring details!
+
+### Core Gameplay
+1. Drag shapes horizontally across the play area
+2. Drop shapes into one of 5 columns
+3. Identical shapes merge automatically when they touch
+4. Merged shapes evolve into more complex geometric forms
+5. Build combos by creating chain reactions
+6. Use the magnet effect to pull shapes from adjacent columns!
+
+### Project Structure
 ```
 Assets/
 ├── Scripts/
-│   ├── GridManager.cs      - Manages the 10x20 grid
-│   ├── Block.cs            - Individual block behavior
-│   ├── Tetromino.cs        - Falling shapes
-│   ├── Spawner.cs          - Spawns new tetrominoes
-│   ├── InputManager.cs     - Handles player input
-│   ├── MergeLogic.cs       - Block merging and combos
-│   ├── ScoreManager.cs     - Scoring system
-│   ├── PowerUpManager.cs   - Power-up effects
-│   ├── GameState.cs        - Game state management
-│   ├── GameController.cs   - Main game loop
-│   ├── UIManager.cs        - In-game UI
-│   ├── MainMenuUI.cs       - Main menu scene
-│   └── GameOverUI.cs       - Game over scene
+│   ├── GridManager.cs           - Column-based grid (5 columns)
+│   ├── ShapeController.cs       - Individual shape behavior
+│   ├── ShapeData.cs             - Shape definitions (octagon, etc.)
+│   ├── InputController.cs       - Drag-and-drop input
+│   ├── MergeMechanic.cs         - Merge animations
+│   ├── OctagonScoreManager.cs   - Scoring and leveling
+│   ├── OctagonUIManager.cs      - Game UI
+│   ├── GameState.cs             - Game state management
+│   ├── MainMenuUI.cs            - Main menu
+│   └── GameOverUI.cs            - Game over screen
 ├── Scenes/
 │   ├── MainMenu.unity
 │   ├── Game.unity

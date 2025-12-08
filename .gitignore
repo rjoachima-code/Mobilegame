@@ -67,3 +67,12 @@ crashlytics-build.properties
 ignore.conf
 *.private.0
 *.private
+
+# Android/Gradle
+.gradle/
+.idea/
+build/
+local.properties
+*.iml
+.cxx/
+logcat*.txt

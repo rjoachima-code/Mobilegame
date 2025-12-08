@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.jacameno.mobilegame
 
 import android.view.View
 import android.os.Handler
@@ -8,7 +8,7 @@ import com.google.androidgamesdk.GameActivity
 class MainActivity : GameActivity() {
     companion object {
         init {
-            System.loadLibrary("myapplication")
+            System.loadLibrary("jacameno")
         }
         @JvmStatic external fun nativeGetScore(): Int
 

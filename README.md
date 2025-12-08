@@ -2,6 +2,13 @@
 
 A Unity mobile game combining M2 Block and Tetris mechanics with a neon minimal art style.
 
+## 🎮 Play Now
+
+**Web Version Available!** Play JACAMENO directly in your browser:
+- 📱 **[Open web/index.html](web/index.html)** in any browser
+- 🌐 **No installation required** - works on desktop and mobile
+- 🎯 **Quick Start**: See [web/README.md](web/README.md) for instructions
+
 ## Game Overview
 
 JACAMENO is a unique puzzle game that combines:
@@ -73,10 +80,60 @@ Assets/
 
 ## Requirements
 
-- Unity 2021.3 LTS or later
-- TextMesh Pro package
+- Unity 2021.3 LTS or later (for Unity-based development)
+- TextMesh Pro package (for Unity)
+- **OR** Android Studio (for native C++ development - current implementation)
 
-## Getting Started
+## Project Status
+
+**This project currently has THREE implementations:**
+
+1. **Web Version** (web/ folder) - HTML5/JavaScript implementation that runs in any browser
+   - ✅ **Ready to play now!** Just open `web/index.html`
+   - ✅ Works on desktop and mobile browsers
+   - ✅ No installation required
+   - See [web/README.md](web/README.md) for details
+
+2. **Unity Implementation** (Assets/ folder) - Original design with Unity scenes and scripts
+   - For Unity-based development and builds
+
+3. **Native Android Implementation** (app/ folder) - C++ native implementation using Android Game SDK
+   - ✅ **Ready for testing** in Android Studio
+   - For high-performance native Android builds
+
+## Quick Start Options
+
+### 🌐 Play in Browser (Easiest - No Installation)
+
+```bash
+# Open the web version
+cd web
+python3 -m http.server 8000
+# Then open: http://localhost:8000
+```
+
+Or simply open `web/index.html` in your browser!
+
+See [web/README.md](web/README.md) for full instructions.
+
+### 📱 Testing on Android (Native Implementation)
+
+**⚡ Fastest way to test the game on Android devices:**
+
+See [docs/QUICK_START_ANDROID.md](docs/QUICK_START_ANDROID.md) for a 5-minute setup guide.
+
+**Summary:**
+1. Install Android Studio
+2. Open this project in Android Studio
+3. Connect an Android device or start an emulator
+4. Click Run ▶
+5. Game will install and launch!
+
+For complete build instructions, see [docs/ANDROID_BUILD_INSTRUCTIONS.md](docs/ANDROID_BUILD_INSTRUCTIONS.md).
+
+For deployment checklist, see [docs/ANDROID_DEPLOYMENT_CHECKLIST.md](docs/ANDROID_DEPLOYMENT_CHECKLIST.md).
+
+## Getting Started (Unity)
 
 1. Clone this repository
 2. Open the project in Unity
@@ -84,6 +141,48 @@ Assets/
 4. Press Play to test the game
 
 ## Building
+
+### Android Native Build (Current Implementation - READY FOR TESTING)
+
+**The project is now configured and ready for Android testing!**
+
+#### What's Been Configured:
+- ✅ Package name: `com.jacameno.mobilegame`
+- ✅ App name: JACAMENO
+- ✅ Native library: `jacameno` (C++ implementation)
+- ✅ Minimum SDK: API 22 (Android 5.1 - covers 99% of devices)
+- ✅ Target SDK: API 34 (Android 14)
+- ✅ All source files properly configured in CMakeLists.txt
+- ✅ MainActivity and native bridge set up
+- ✅ Touch input handling via GameActivity
+- ✅ Audio support with fallback
+- ✅ Full-screen immersive mode
+
+#### Build in Android Studio:
+1. Open the project root in Android Studio
+2. Let Gradle sync (may take a few minutes first time)
+3. Connect device or start emulator
+4. Click Run ▶
+5. APK builds, installs, and launches automatically
+
+See [docs/QUICK_START_ANDROID.md](docs/QUICK_START_ANDROID.md) for detailed walkthrough.
+
+#### Build from Command Line:
+```bash
+# Debug APK
+./gradlew assembleDebug
+
+# Release APK (requires signing configuration)
+./gradlew assembleRelease
+
+# Install to connected device
+./gradlew installDebug
+
+# Build and install
+./gradlew installDebug
+```
+
+Output APK location: `app/build/outputs/apk/debug/app-debug.apk`
 
 ### Android (Direct APK Build)
 1. File > Build Settings
@@ -209,6 +308,49 @@ These templates are automatically used when exporting to Android Studio, ensurin
 - Use x86_64 system images for Intel/AMD processors
 
 ### iOS
+1. File > Build Settings
+2. Select iOS platform
+3. Configure Player Settings
+4. Click Build to generate Xcode project
+5. Open in Xcode and build/deploy
+
+## Android Testing Documentation
+
+Comprehensive guides are available in the `docs/` folder:
+
+- **📘 [Quick Start Guide](docs/QUICK_START_ANDROID.md)** - Get up and running in 5 minutes
+- **📗 [Complete Build Instructions](docs/ANDROID_BUILD_INSTRUCTIONS.md)** - All build options and configurations
+- **📙 [Deployment Checklist](docs/ANDROID_DEPLOYMENT_CHECKLIST.md)** - Pre-release requirements
+- **📕 [Readiness Summary](docs/ANDROID_READINESS.md)** - Current status and what's completed
+- **🔧 [Troubleshooting Guide](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+
+### What's Ready for Android Testing
+
+✅ **Fully Configured:**
+- Package name: `com.jacameno.mobilegame`
+- Native C++ game implementation with GameActivity
+- Touch input handling
+- Audio support
+- OpenGL ES rendering
+- Full-screen immersive mode
+- Build scripts and Gradle configuration
+
+✅ **Ready to Build:**
+```bash
+# Open in Android Studio and click Run ▶
+# Or use command line:
+./gradlew assembleDebug
+```
+
+✅ **Documentation:**
+- Complete setup guides
+- Build instructions
+- Deployment checklist
+- Troubleshooting guide
+
+**Next Step:** Follow the [Quick Start Guide](docs/QUICK_START_ANDROID.md) to build and test!
+
+## Development Tips
 1. File > Build Settings
 2. Select iOS platform
 3. Configure Player Settings

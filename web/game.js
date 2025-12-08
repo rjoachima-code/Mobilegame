@@ -35,22 +35,34 @@ class Game {
     }
     
     initSounds() {
-        // Simple sound effects using Web Audio API
+        // Audio context initialized lazily on first user interaction
         this.audioContext = null;
         this.soundsEnabled = true;
+    }
+    
+    ensureAudioContext() {
+        if (!this.soundsEnabled) return false;
         
-        // Try to create audio context (will be initialized on first user interaction)
-        try {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.audioContext = new AudioContext();
-        } catch (e) {
-            console.log('Web Audio API not supported');
-            this.soundsEnabled = false;
+        if (!this.audioContext) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                this.audioContext = new AudioContext();
+                
+                // Resume context if it's suspended (browser autoplay policy)
+                if (this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+            } catch (e) {
+                console.log('Web Audio API not supported');
+                this.soundsEnabled = false;
+                return false;
+            }
         }
+        return true;
     }
     
     playSound(type) {
-        if (!this.soundsEnabled || !this.audioContext) return;
+        if (!this.ensureAudioContext()) return;
         
         const ctx = this.audioContext;
         const oscillator = ctx.createOscillator();
@@ -621,15 +633,41 @@ function showScreen(screenId) {
     document.getElementById(screenId).classList.add('active');
 }
 
+function showError(message) {
+    document.getElementById('error-message').textContent = message;
+    document.getElementById('error-screen').style.display = 'flex';
+}
+
+function hideError() {
+    document.getElementById('error-screen').style.display = 'none';
+}
+
 // Initialize game
 let game = null;
 
-document.getElementById('start-btn').addEventListener('click', () => {
-    if (!game) {
-        game = new Game();
+// Initialize high score display on page load
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const savedHighScore = localStorage.getItem('jacameno_highscore');
+        if (savedHighScore) {
+            document.getElementById('high-score').textContent = savedHighScore;
+        }
+    } catch (e) {
+        console.log('Could not load high score');
     }
-    game.start();
-    showScreen('game-screen');
+});
+
+document.getElementById('start-btn').addEventListener('click', () => {
+    try {
+        if (!game) {
+            game = new Game();
+        }
+        game.start();
+        showScreen('game-screen');
+    } catch (error) {
+        console.error('Error starting game:', error);
+        showError('Failed to start game. Please refresh the page and try again.');
+    }
 });
 
 document.getElementById('pause-btn').addEventListener('click', () => {
@@ -659,5 +697,10 @@ document.getElementById('play-again-btn').addEventListener('click', () => {
 });
 
 document.getElementById('menu-btn-2').addEventListener('click', () => {
+    showScreen('menu-screen');
+});
+
+document.getElementById('error-close-btn').addEventListener('click', () => {
+    hideError();
     showScreen('menu-screen');
 });

@@ -2,11 +2,20 @@
 
 This is the browser-based version of JACAMENO that can be played directly in any modern web browser.
 
+## 🆕 What's New in v0.9.0
+
+- ⭐ **High Score Persistence**: Your high score now saves automatically
+- 🔊 **Sound Effects**: Audio feedback for moves, rotations, merges, and more
+- 🎉 **New High Score Celebration**: Special animation when you beat your record
+- 📊 **Enhanced UI**: High score displayed on menu screen
+
 ## Features
 
 - ✅ Full Tetris gameplay with tetromino pieces (I, O, T, L, J, S, Z)
 - ✅ M2 Block merge mechanics (blocks with same value merge and double)
 - ✅ Score tracking and leveling system
+- ✅ High score persistence (automatically saves)
+- ✅ Sound effects for game actions
 - ✅ Keyboard controls (Arrow keys, WASD, Space)
 - ✅ Touch controls for mobile devices (swipe and tap)
 - ✅ Responsive design works on desktop and mobile
@@ -167,12 +176,16 @@ The web version is a lightweight implementation focused on core gameplay:
 - ✅ Scoring and levels
 - ✅ Touch and keyboard controls
 - ✅ Pause/resume
+- ✅ High score persistence
+- ✅ Sound effects
 
 **Not Yet Implemented:**
 - ⏳ Power-ups (Bomb, Freeze, etc.)
-- ⏳ Sound effects
-- ⏳ High score persistence (localStorage can be added)
+- ⏳ Background music
+- ⏳ Settings menu (sound toggle, etc.)
 - ⏳ Advanced visual effects
+- ⏳ Achievements
+- ⏳ Online leaderboard
 
 These features can be added in future updates!
 
@@ -180,16 +193,20 @@ These features can be added in future updates!
 
 - [ ] Game loads without errors
 - [ ] Main menu displays correctly
+- [ ] High score displays on menu
 - [ ] Start button launches game
 - [ ] Pieces fall automatically
 - [ ] Keyboard controls work (all keys)
 - [ ] Touch controls work (swipe/tap)
+- [ ] Sound effects play (move, rotate, drop, merge, line, gameover)
 - [ ] Blocks merge when same value touches
 - [ ] Lines clear when complete
 - [ ] Score updates correctly
 - [ ] Level increases every 10 lines
 - [ ] Pause/resume works
 - [ ] Game over triggers correctly
+- [ ] High score saves and persists
+- [ ] New high score message displays when applicable
 - [ ] Play again restarts game
 - [ ] Works on mobile devices
 - [ ] Responsive design adapts to screen size

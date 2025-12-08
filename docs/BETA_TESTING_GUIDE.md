@@ -16,7 +16,6 @@ Welcome to the JACAMENO beta testing program! Thank you for helping us improve t
 ### Web Version (Easiest - Start Here!)
 
 1. **Open the game**: Navigate to `web/index.html` in your browser
-   - Or visit: [Your hosted URL here]
    
 2. **For local testing**:
    ```bash

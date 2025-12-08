@@ -1,0 +1,54 @@
+{
+  "version": "0.9.0",
+  "name": "JACAMENO",
+  "description": "Tetris meets M2 Block Merge",
+  "status": "beta",
+  "releaseDate": "2024-12-08",
+  "implementations": {
+    "web": {
+      "version": "0.9.0",
+      "features": [
+        "Core Tetris mechanics",
+        "M2 Block merge system",
+        "High score persistence",
+        "Sound effects",
+        "Keyboard controls",
+        "Touch controls",
+        "Responsive design"
+      ],
+      "platforms": ["browser", "mobile-web"]
+    },
+    "android": {
+      "version": "0.8.0",
+      "packageName": "com.jacameno.mobilegame",
+      "minSdk": 22,
+      "targetSdk": 34,
+      "features": [
+        "Native C++ implementation",
+        "GameActivity integration",
+        "Touch input",
+        "OpenGL ES 3.0",
+        "Full-screen mode"
+      ],
+      "platforms": ["android"]
+    },
+    "unity": {
+      "version": "0.6.0",
+      "status": "development",
+      "features": [
+        "Unity scenes",
+        "Power-up system design",
+        "Neon art style"
+      ],
+      "platforms": ["unity-export"]
+    }
+  },
+  "betaTesting": {
+    "enabled": true,
+    "guide": "docs/BETA_TESTING_GUIDE.md",
+    "reporting": {
+      "bugs": ".github/ISSUE_TEMPLATE/bug_report.md",
+      "features": ".github/ISSUE_TEMPLATE/feature_request.md"
+    }
+  }
+}

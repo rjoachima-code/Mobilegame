@@ -74,8 +74,45 @@ body {
 
 .subtitle {
     font-size: 1.2rem;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     opacity: 0.9;
+}
+
+.high-score-display {
+    font-size: 1.5rem;
+    margin: 20px 0;
+    padding: 15px 30px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.high-score-display .label {
+    opacity: 0.8;
+    margin-right: 10px;
+}
+
+.high-score-display .value {
+    font-weight: bold;
+    color: #ffd700;
+    font-size: 1.8rem;
+}
+
+.new-high-score {
+    color: #ffd700;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin: 20px 0;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
 }
 
 .btn {

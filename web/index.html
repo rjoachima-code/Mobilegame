@@ -11,6 +11,10 @@
         <div id="menu-screen" class="screen active">
             <h1 class="title">JACAMENO</h1>
             <p class="subtitle">Tetris meets M2 Block Merge</p>
+            <div class="high-score-display">
+                <span class="label">High Score:</span>
+                <span id="high-score" class="value">0</span>
+            </div>
             <button id="start-btn" class="btn btn-primary">Start Game</button>
             <div class="controls-info">
                 <h3>Controls</h3>
@@ -62,6 +66,7 @@
             <div class="modal">
                 <h2>Game Over</h2>
                 <p class="final-score">Score: <span id="final-score">0</span></p>
+                <p id="new-high-score" class="new-high-score" style="display: none;">🎉 New High Score! 🎉</p>
                 <button id="play-again-btn" class="btn btn-primary">Play Again</button>
                 <button id="menu-btn-2" class="btn btn-secondary">Main Menu</button>
             </div>

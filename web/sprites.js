@@ -60,7 +60,7 @@ class GeometricRenderer {
         const config = this.getShapeConfig(value);
         const cx = x + size / 2;
         const cy = y + size / 2;
-        const radius = size * 0.35; // Leave margin for glow
+        const radius = size * 0.4; // Increased from 0.35 for more prominent shapes
         
         this.ctx.save();
         this.ctx.globalAlpha = alpha;
@@ -82,9 +82,9 @@ class GeometricRenderer {
     // Bloom effect - multiple gaussian blur layers
     drawBloomEffect(cx, cy, radius, config) {
         const layers = [
-            { offset: 0, blur: 20, alpha: 0.4 },
-            { offset: 0, blur: 10, alpha: 0.5 },
-            { offset: 0, blur: 5, alpha: 0.6 }
+            { offset: 0, blur: 15, alpha: 0.3 },
+            { offset: 0, blur: 8, alpha: 0.4 },
+            { offset: 0, blur: 3, alpha: 0.5 }
         ];
         
         layers.forEach(layer => {
@@ -95,7 +95,7 @@ class GeometricRenderer {
             
             // Draw a simple circle for the glow base
             this.ctx.beginPath();
-            this.ctx.arc(cx, cy, radius * 1.1, 0, Math.PI * 2);
+            this.ctx.arc(cx, cy, radius * 0.8, 0, Math.PI * 2);
             this.ctx.fillStyle = config.color;
             this.ctx.fill();
             
